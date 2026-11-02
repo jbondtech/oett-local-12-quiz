@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OETT Local 12 Operating Engineers Math Quiz Engine</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MathJax 3 -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body { background-color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; }
+    .oett-card { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .oett-option-label { transition: all 0.2s ease; cursor: pointer; }
+    .oett-option-label:hover { background-color: #f8fafc; border-color: #3b82f6; }
+    .correct-bg { background-color: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; }
+    .incorrect-bg { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+    .oett-data-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; text-align: center; }
+    .oett-data-table th { background-color: #1e3a8a; color: white; padding: 8px; border: 1px solid #cbd5e1; }
+    .oett-data-table td { padding: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc; }
+  </style>
+</head>
+<body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+
+  <div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Header Banner -->
+    <header class="oett-card p-6 text-center border-t-4 border-blue-800">
+      <div class="inline-block bg-blue-100 text-blue-900 font-extrabold px-3 py-1 rounded-full text-xs uppercase tracking-widest mb-2">
+        Operating Engineers Training Trust
+      </div>
+      <h1 class="text-3xl font-extrabold text-slate-900">OETT Local 12 Math & Inspection Quiz Engine</h1>
+      <p class="text-slate-600 mt-1 text-sm">Automated Trade-Grounded Assessment & Field Inspection Problem Suite</p>
+    </header>
+
+    <!-- Control Panel / Teacher Configuration Card -->
+    <div id="teacher-control-card" class="oett-card p-6 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          ⚙️ Generator & Quiz Configuration
+        </h2>
+        <span id="mode-badge" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
+          Teacher / Admin Mode
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Module Selector -->
+        <div>
+          <label for="module-select" class="block text-xs font-bold text-slate-700 uppercase mb-1">
+            Select Problem Module
+          </label>
+          <select id="module-select" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="FULL_ASSESSMENT" selected>★ Full 22-Question OETT Local 12 Assessment</option>
+            <option value="StackedMaterialThicknessGenerator">Module 1: Stacked Material Thickness</option>
+            <option value="BulkHardwareWeightGenerator">Module 2: Bulk Hardware Weight</option>
+            <option value="OperatingEngineersUnitConversionGenerator">Module 3: Linear & Decimal Feet Units</option>
+            <option value="RateBasedMaterialCostGenerator">Module 4: Rate-Based Material Costing</option>
+            <option value="StackedMaterialQuantityGenerator">Module 5: Stacked Material Quantity & Timber Count</option>
+            <option value="CompositeAssemblyCostingGenerator">Module 6: Composite Assembly & Civil Stations</option>
+            <option value="SafeWorkingLoadCapacityGenerator">Module 7: Safe Working Load Capacity</option>
+            <option value="RectangularVolumeGenerator">Module 8: 3D Rectangular Volume & Cubic Yards</option>
+            <option value="DecimalFractionEquivalenceGenerator">Module 9: Decimal & Fraction Equivalence</option>
+            <option value="WeightedGroupAverageGenerator">Module 10: Weighted Cargo Group Averages</option>
+            <option value="MultiTermFractionSummationGenerator">Module 11: Multi-Term Fraction Summation</option>
+            <option value="BulkGroupDozenConversionGenerator">Module 12: Dozens, Gross, and Case Units</option>
+            <option value="FractionalRateThreadPitchGenerator">Module 13: Linear Density & Fastener Thread Pitch</option>
+            <option value="CompositeCutoutAreaGenerator">Module 14: Composite Cutout Area (With SVG Diagrams)</option>
+            <option value="ToleranceRangeAcceptableValueGenerator">Module 15: Tolerance Range & Acceptable Values</option>
+            <option value="TabularDataLookupAverageGenerator">Module 16: Tabular Data Lookups & Column Means</option>
+            <option value="BarChartDataInterpretationGenerator">Module 17: Bar Chart Interpretation (With Graphs)</option>
+          </select>
+        </div>
+
+        <!-- Question Count Input -->
+        <div>
+          <label for="count-input" class="block text-xs font-bold text-slate-700 uppercase mb-1">
+            Number of Questions <span id="count-limit-label" class="text-slate-500 font-normal">(Locked to 22 for Full Exam)</span>
+          </label>
+          <input type="number" id="count-input" value="22" min="1" max="25" disabled
+                 class="w-full bg-slate-100 border border-slate-300 rounded-lg p-2.5 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed">
+        </div>
+      </div>
+
+      <!-- Google Apps Script Web App Endpoint for Auto-Grading -->
+      <div>
+        <label for="script-url-input" class="block text-xs font-bold text-slate-700 uppercase mb-1">
+          Google Sheets Web App Endpoint URL (Optional Score Logger)
+        </label>
+        <input type="text" id="script-url-input" placeholder="https://script.google.com/macros/s/.../exec"
+               class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap gap-3 pt-2">
+        <button id="generate-quiz-btn" class="flex-1 bg-blue-800 hover:bg-blue-900 text-white font-bold py-2.5 px-4 rounded-lg shadow transition flex items-center justify-center gap-2 text-sm">
+          <span>🎲</span> Generate New Quiz Batch
+        </button>
+        <button id="share-link-btn" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-lg shadow transition flex items-center justify-center gap-2 text-sm">
+          <span>🔗</span> Copy Student Quiz Link
+        </button>
+      </div>
+    </div>
+
+    <!-- Student Info Card (Student Registration) -->
+    <div id="student-info-card" class="oett-card p-6 space-y-4">
+      <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+        👤 Student Identification
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="student-first-name" class="block text-xs font-bold text-slate-700 uppercase mb-1">
+            First Name <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="student-first-name" placeholder="John" required
+                 class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label for="student-last-name" class="block text-xs font-bold text-slate-700 uppercase mb-1">
+            Last Name <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="student-last-name" placeholder="Doe" required
+                 class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Assessment Container -->
+    <form id="quiz-form" class="space-y-6">
+      <div id="quiz-questions-container" class="space-y-6">
+        <!-- Dynamic Questions Rendered Here -->
+      </div>
+
+      <!-- Quiz Submission Card -->
+      <div class="oett-card p-6 text-center space-y-4">
+        <button type="submit" id="submit-quiz-btn" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-lg py-3 px-8 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">
+          Submit Assessment & Check Answers
+        </button>
+        <div id="quiz-results-banner" class="hidden p-4 rounded-xl text-center font-bold text-lg"></div>
+      </div>
+    </form>
+
+  </div>
+
+  <!-- JavaScript Suite & Quiz Engine Harness -->
+  <script>
+// OETT LOCAL 12 HEAVY EQUIPMENT & CIVIL MATH GENERATOR SUITE - MASTER BUNDLE (ALL 17 MODULES)
+
+// =========================================================
+// FILE: 01_StackedMaterialThicknessGenerator.js
+// =========================================================
+/**
+ * Module 1: Stacked Material Thickness Generator (OETT Local 12)
+ * Calculates total 3-layer material thickness sandwiches with mixed trade stock fractions.
+ */
+class StackedMaterialThicknessGenerator {
+  constructor() {
+    this.pools = ['TIER_1_LIKE_DENOMINATORS', 'TIER_2_TRADE_STANDARD_DENOMINATORS', 'TIER_3_COMPLEX_MIXED_DENOMINATORS'];
+    this.scenarios = ['wear pad shim stack', 'concrete formwork assembly', 'trench plate support stack', 'crane outrigger dunnage'];
+  }
+
+  gcd(a, b) { return b === 0 ? a : this.gcd(b, a % b); }
+
+  reduceFraction(num, den) {
+    if (num === 0) return { whole: 0, num: 0, den: 1, str: "0" };
+    const g = this.gcd(Math.abs(num), Math.abs(den));
+    let n = num / g;
+    let d = den / g;
+    const w = Math.floor(n / d);
+    n = n % d;
+    let fracStr = "";
+    if (w > 0 && n > 0) fracStr = `${w} ${n}/${d}`;
+    else if (w > 0 && n === 0) fracStr = `${w}`;
+    else if (w === 0 && n > 0) fracStr = `${n}/${d}`;
+    else fracStr = "0";
+    return { whole: w, num: n, den: d, str: fracStr };
+  }
+
+  generateSingleProblem(type) {
+    let t1_w = 0, t1_n = 1, t1_d = 8;
+    let t2_w = 0, t2_n = 1, t2_d = 8;
+    let t3_w = 0, t3_n = 1, t3_d = 8;
+
+    if (type === 'TIER_1_LIKE_DENOMINATORS') {
+      t1_d = t2_d = t3_d = 8;
+      t1_n = [1, 3, 5, 7][Math.floor(Math.random() * 4)];
+      t2_n = [1, 3, 5, 7][Math.floor(Math.random() * 4)];
+      t3_n = [1, 3, 5, 7][Math.floor(Math.random() * 4)];
+    } else if (type === 'TIER_2_TRADE_STANDARD_DENOMINATORS') {
+      t1_d = 4; t2_d = 8; t3_d = 16;
+      t1_n = [1, 3][Math.floor(Math.random() * 2)];
+      t2_n = [1, 3, 5, 7][Math.floor(Math.random() * 4)];
+      t3_n = [1, 3, 5, 7, 9, 11, 13, 15][Math.floor(Math.random() * 8)];
+    } else {
+      t1_d = 2; t2_d = 8; t3_d = 16; t1_w = 1; t2_w = 2;
+      t1_n = 1; t2_n = 3; t3_n = 5;
+    }
+
+    const commonDen = 16;
+    const totalSixteenths = (t1_w * 16 + t1_n * (16 / t1_d)) +
+                           (t2_w * 16 + t2_n * (16 / t2_d)) +
+                           (t3_w * 16 + t3_n * (16 / t3_d));
+
+    const ans = this.reduceFraction(totalSixteenths, 16);
+    const scenario = this.scenarios[Math.floor(Math.random() * this.scenarios.length)];
+
+    const f1Str = t1_w > 0 ? `${t1_w} ${t1_n}/${t1_d}` : `${t1_n}/${t1_d}`;
+    const f2Str = t2_w > 0 ? `${t2_w} ${t2_n}/${t2_d}` : `${t2_n}/${t2_d}`;
+    const f3Str = t3_w > 0 ? `${t3_w} ${t3_n}/${t3_d}` : `${t3_n}/${t3_d}`;
+
+    const promptText = `An Operating Engineer field mechanic is building a 3-layer ${scenario}. Layer 1 measures ${f1Str} inches, Layer 2 measures ${f2Str} inches, and Layer 3 measures ${f3Str} inches. What is the total combined thickness in inches?`;
+
+    const optSet = new Set([ans.str]);
+    optSet.add(this.reduceFraction(totalSixteenths + 2, 16).str);
+    optSet.add(this.reduceFraction(totalSixteenths - 2, 16).str);
+    optSet.add(this.reduceFraction(totalSixteenths + 4, 16).str);
+
+    const options = Array.from(optSet).sort(() => Math.random() - 0.5);
+
+    return {
+      id: `oett12_stack_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "STACKED_MATERIAL_THICKNESS",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: ans.str,
+      options: options,
+      explanation: `Convert all layers to 16ths: ${f1Str} + ${f2Str} + ${f3Str} = ${ans.str} inches.`,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 02_BulkHardwareWeightGenerator.js
+// =========================================================
+/**
+ * Module 2: Bulk Hardware Weight Generator (OETT Local 12)
+ * Multiplies hardware piece counts by unit weights (decimals and whole numbers).
+ */
+class BulkHardwareWeightGenerator {
+  constructor() {
+    this.pools = ['TIER_1_INTEGER_UNIT_WEIGHTS', 'TIER_2_HALVES_QUARTERS_DECIMALS', 'TIER_3_PRECISION_DECIMAL_WEIGHTS'];
+    this.hardware = ['grade-8 anchor bolts', 'excavator bucket tooth pins', 'hydraulic hose fittings', 'crane track shoe pins'];
+  }
+
+  generateSingleProblem(type) {
+    const item = this.hardware[Math.floor(Math.random() * this.hardware.length)];
+    let count = Math.floor(Math.random() * 30 + 10);
+    let unitWeight = 2.5;
+
+    if (type === 'TIER_1_INTEGER_UNIT_WEIGHTS') {
+      unitWeight = Math.floor(Math.random() * 8 + 2);
+    } else if (type === 'TIER_2_HALVES_QUARTERS_DECIMALS') {
+      unitWeight = [1.5, 2.25, 3.5, 4.75, 6.5][Math.floor(Math.random() * 5)];
+    } else {
+      unitWeight = parseFloat((Math.random() * 5 + 1.15).toFixed(2));
+    }
+
+    const totalWeight = parseFloat((count * unitWeight).toFixed(2));
+    const correctAnswerStr = `${totalWeight} lbs`;
+
+    const promptText = `A jobsite shipment contains ${count} heavy-duty ${item}. If each unit weighs ${unitWeight} lbs, what is the total weight of the shipment?`;
+
+    const dAdd = `${(count + unitWeight).toFixed(2)} lbs`;
+    const dOff = `${(totalWeight + unitWeight).toFixed(2)} lbs`;
+    const dSub = `${(totalWeight - 2.5).toFixed(2)} lbs`;
+
+    const options = Array.from(new Set([correctAnswerStr, dAdd, dOff, dSub])).sort(() => Math.random() - 0.5);
+
+    return {
+      id: `oett12_hw_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "BULK_HARDWARE_WEIGHT",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: `Total Weight = Count × Unit Weight = ${count} × ${unitWeight} lbs = ${correctAnswerStr}.`,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 03_OperatingEngineersUnitConversionGenerator.js
+// =========================================================
+/**
+ * Module 3: Operating Engineers Unit Conversion Generator (OETT Local 12)
+ * Linear conversions between inches, feet, yards, miles, and surveyor decimal feet.
+ */
+class OperatingEngineersUnitConversionGenerator {
+  constructor() {
+    this.pools = ['TIER_1_INCHES_TO_FEET_YARDS', 'TIER_2_FEET_TO_MILES', 'TIER_3_SURVEYOR_DECIMAL_FEET_RODS'];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_INCHES_TO_FEET_YARDS') {
+      const feet = Math.floor(Math.random() * 15 + 3);
+      const inches = feet * 12;
+      correctAnswerStr = `${feet} ft`;
+      promptText = `Convert a trench depth measurement of ${inches} inches into feet.`;
+      explanationStr = `${inches} inches ÷ 12 inches/ft = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `${feet + 2} ft`, `${feet - 1} ft`, `${inches * 12} ft`].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_FEET_TO_MILES') {
+      const miles = [0.5, 1.5, 2.5, 3.0][Math.floor(Math.random() * 4)];
+      const feet = miles * 5280;
+      correctAnswerStr = `${miles} miles`;
+      promptText = `A highway excavation project extends over a length of ${feet.toLocaleString()} feet. How many miles does this equal?`;
+      explanationStr = `${feet.toLocaleString()} ft ÷ 5,280 ft/mile = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `${miles + 1} miles`, `${miles - 0.25} miles`, `${(feet/1000).toFixed(1)} miles`].sort(() => Math.random() - 0.5);
+
+    } else {
+      const wholeFeet = Math.floor(Math.random() * 10 + 5);
+      const inchVal = 6; // 0.5 ft
+      const decimalFeet = wholeFeet + 0.5;
+      correctAnswerStr = `${decimalFeet.toFixed(2)} ft`;
+      promptText = `A grade checker rod reading shows ${wholeFeet} feet ${inchVal} inches. Convert this reading into surveyor decimal feet.`;
+      explanationStr = `${inchVal} inches ÷ 12 = 0.50 ft. Total = ${wholeFeet} + 0.50 = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `${wholeFeet}.${inchVal} ft`, `${wholeFeet + 1}.00 ft`, `${decimalFeet + 0.25} ft`].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_unit_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "OPERATING_ENGINEERS_UNIT_CONVERSION",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 04_RateBasedMaterialCostGenerator.js
+// =========================================================
+/**
+ * Module 4: Rate-Based Material Cost Generator (OETT Local 12)
+ * Calculates material costs across linear, weight, fluid, and pipe joint pricing.
+ */
+class RateBasedMaterialCostGenerator {
+  constructor() {
+    this.pools = ['TIER_1_LINEAR_MATERIAL_COST', 'TIER_2_WEIGHT_TONNAGE_COST', 'TIER_3_FLUID_VOLUME_COST', 'TIER_4_PIPE_JOINT_SECTION_COST'];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_LINEAR_MATERIAL_COST') {
+      const feet = Math.floor(Math.random() * 200 + 50);
+      const rate = 3.50;
+      const total = feet * rate;
+      correctAnswerStr = `\$${total.toFixed(2)}`;
+      promptText = `An equipment supervisor orders ${feet} feet of heavy-duty crane hoist wire rope at \$${rate.toFixed(2)} per linear foot. What is the total cost?`;
+      explanationStr = `${feet} ft × \$${rate.toFixed(2)}/ft = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `\$${(total + 50).toFixed(2)}`, `\$${(feet + rate).toFixed(2)}`, `\$${(total - 35).toFixed(2)}`].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_WEIGHT_TONNAGE_COST') {
+      const tons = Math.floor(Math.random() * 40 + 10);
+      const rate = 22.50;
+      const total = tons * rate;
+      correctAnswerStr = `\$${total.toFixed(2)}`;
+      promptText = `A civil paving job requires ${tons} tons of aggregate base rock delivered at \$${rate.toFixed(2)} per ton. Calculate the total material cost.`;
+      explanationStr = `${tons} tons × \$${rate.toFixed(2)}/ton = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `\$${(total + 100).toFixed(2)}`, `\$${(total - 45).toFixed(2)}`, `\$${(tons * 10).toFixed(2)}`].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_3_FLUID_VOLUME_COST') {
+      const drums = Math.floor(Math.random() * 5 + 2);
+      const drumGal = 55;
+      const galRate = 12.00;
+      const total = drums * drumGal * galRate;
+      correctAnswerStr = `\$${total.toFixed(2)}`;
+      promptText = `A maintenance shop purchases ${drums} 55-gallon drums of ISO 46 hydraulic oil at \$${galRate.toFixed(2)} per gallon. What is the total invoice cost?`;
+      explanationStr = `${drums} drums × 55 gal/drum = ${drums * 55} gal. ${drums * 55} gal × \$${galRate.toFixed(2)}/gal = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `\$${(drums * galRate).toFixed(2)}`, `\$${(total + 200).toFixed(2)}`, `\$${(total - 110).toFixed(2)}`].sort(() => Math.random() - 0.5);
+
+    } else {
+      const joints = Math.floor(Math.random() * 15 + 5);
+      const lengthPerJoint = 20; // ft
+      const ratePerFt = 18.50;
+      const total = joints * lengthPerJoint * ratePerFt;
+      correctAnswerStr = `\$${total.toFixed(2)}`;
+      promptText = `A utility drainage job orders ${joints} joints of 24-inch corrugated pipe (20 feet per joint) at \$${ratePerFt.toFixed(2)} per linear foot. Calculate the total cost.`;
+      explanationStr = `${joints} joints × 20 ft = ${joints * 20} ft. ${joints * 20} ft × \$${ratePerFt.toFixed(2)}/ft = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `\$${(joints * ratePerFt).toFixed(2)}`, `\$${(total + 300).toFixed(2)}`, `\$${(total - 150).toFixed(2)}`].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_cost_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "RATE_BASED_MATERIAL_COST",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 05_StackedMaterialQuantityGenerator.js
+// =========================================================
+/**
+ * Module 5: Stacked Material Quantity Generator (OETT Local 12)
+ * Calculates piece counts for staged material stacks (Height ÷ Layer Thickness).
+ */
+class StackedMaterialQuantityGenerator {
+  constructor() {
+    this.pools = ['TIER_1_WHOLE_INCH_DIVISION', 'TIER_2_FRACTIONAL_INCH_DIVISION', 'TIER_3_FEET_TO_INCH_MIXED_STACKS'];
+    this.materials = ['trench shoring planks', 'timber crane mats', 'plywood formwork sheets'];
+  }
+
+  generateSingleProblem(type) {
+    const mat = this.materials[Math.floor(Math.random() * this.materials.length)];
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_WHOLE_INCH_DIVISION') {
+      const pcs = Math.floor(Math.random() * 15 + 10);
+      const thick = 3; // inches
+      const totalH = pcs * thick;
+      correctAnswerStr = `${pcs} pieces`;
+      promptText = `A pallet stack of heavy-duty ${mat} stands ${totalH} inches high. If each plank is ${thick} inches thick, how many individual planks are in the stack?`;
+      explanationStr = `${totalH} inches ÷ ${thick} inches/piece = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `${pcs + 3} pieces`, `${pcs - 2} pieces`, `${totalH * thick} pieces`].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_FRACTIONAL_INCH_DIVISION') {
+      const pcs = Math.floor(Math.random() * 20 + 8);
+      const thick = 1.5; // 1-1/2"
+      const totalH = pcs * thick;
+      correctAnswerStr = `${pcs} pieces`;
+      promptText = `A staging yard stack of ${mat} measures ${totalH} inches tall. If each board is 1½ inches thick, how many boards are in the stack?`;
+      explanationStr = `${totalH} inches ÷ 1.5 inches/board = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `${pcs + 4} pieces`, `${pcs - 3} pieces`, `${totalH} pieces`].sort(() => Math.random() - 0.5);
+
+    } else {
+      const pcs = 24;
+      const thick = 2; // inches
+      const totalFeet = 4; // 4 ft = 48 inches
+      correctAnswerStr = `${pcs} pieces`;
+      promptText = `A crane mat timber bundle stands exactly 4 feet high. If each timber plank is 2 inches thick, how many planks are in the stack?`;
+      explanationStr = `4 feet = 48 inches. 48 inches ÷ 2 inches/plank = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `12 pieces`, `48 pieces`, `20 pieces`].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_qty_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "STACKED_MATERIAL_QUANTITY",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 06_CompositeAssemblyCostingGenerator.js
+// =========================================================
+/**
+ * Module 6: Composite Assembly Costing Generator (OETT Local 12)
+ * Two-part composite assembly costing with Civil Stationing (STA).
+ */
+class CompositeAssemblyCostingGenerator {
+  constructor() {
+    this.pools = ['TIER_1_TWO_PART_COMPOSITE_COST', 'TIER_2_CIVIL_STATIONING_STA_ASSEMBLY', 'TIER_3_THREE_PART_INFRASTRUCTURE_COST'];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_TWO_PART_COMPOSITE_COST') {
+      const lengthFt = 500;
+      const pipeCostPerFt = 25.00;
+      const beddingCostPerFt = 10.00;
+      const total = lengthFt * (pipeCostPerFt + beddingCostPerFt);
+      correctAnswerStr = `\$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      promptText = `A utility pipe run requires 500 feet of pipe at \$25.00/ft plus pea gravel bedding at \$10.00/ft. What is the total combined assembly cost?`;
+      explanationStr = `500 ft × (\$25.00 + \$10.00) = 500 ft × \$35.00/ft = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `\$12,500.00`, `\$5,000.00`, `\$20,000.00`].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_CIVIL_STATIONING_STA_ASSEMBLY') {
+      // STA 10+00 to STA 15+50 -> 550 feet
+      const staStart = "10+00";
+      const staEnd = "15+50";
+      const feet = 550;
+      const ratePerFt = 42.00;
+      const total = feet * ratePerFt;
+      correctAnswerStr = `\$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      promptText = `A highway guardrail installation spans from Station STA ${staStart} to STA ${staEnd}. If guardrail material and installation costs \$${ratePerFt.toFixed(2)} per linear foot, calculate the total installation cost.`;
+      explanationStr = `Distance = STA 15+50 - STA 10+00 = 550 feet. Total Cost = 550 ft × \$42.00/ft = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `\$23,100.00`, `\$15,500.00`, `\$25,000.00`].sort(() => Math.random() - 0.5);
+
+    } else {
+      const feet = 1000;
+      const c1 = 15.00, c2 = 8.50, c3 = 4.50;
+      const total = feet * (c1 + c2 + c3);
+      correctAnswerStr = `\$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      promptText = `A 1,000-foot silt fence assembly costs \$15.00/ft for fabric, \$8.50/ft for posts, and \$4.50/ft for labor. What is the grand total cost?`;
+      explanationStr = `1,000 ft × (\$15.00 + \$8.50 + \$4.50) = 1,000 ft × \$28.00/ft = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `\$15,000.00`, `\$280,000.00`, `\$25,000.00`].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_comp_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "COMPOSITE_ASSEMBLY_COSTING",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 07_SafeWorkingLoadCapacityGenerator.js
+// =========================================================
+/**
+ * Module 7: Safe Working Load Capacity Generator (OETT Local 12)
+ * Fractional ton safe working load conversions and maximum weight selection.
+ */
+class SafeWorkingLoadCapacityGenerator {
+  constructor() {
+    this.pools = ['TIER_1_FRACTIONAL_TON_TO_LBS', 'TIER_2_SWL_MARGIN_OF_SAFETY', 'TIER_3_RIGGING_HARDWARE_LIMITS'];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_FRACTIONAL_TON_TO_LBS') {
+      const fracStr = "3/4";
+      const tonVal = 0.75;
+      const lbs = tonVal * 2000;
+      correctAnswerStr = `${lbs} lbs`;
+      promptText = `A web rigging sling has a Safe Working Load (SWL) rating of ¾ ton. What is its maximum safe working capacity in pounds?`;
+      explanationStr = `1 ton = 2,000 lbs. ¾ ton = 0.75 × 2,000 lbs = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `1,200 lbs`, `750 lbs`, `3,000 lbs`].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_SWL_MARGIN_OF_SAFETY') {
+      const swlLbs = 5000;
+      const loadLbs = 4200;
+      correctAnswerStr = "SAFE";
+      promptText = `An excavator quick-coupler hook is rated for a Safe Working Load (SWL) of 2.5 tons (5,000 lbs). A rigger attaches a precast concrete vault weighing 4,200 lbs. Is this lift SAFE or UNSAFE?`;
+      explanationStr = `4,200 lbs is less than the 5,000 lbs rating, so the lift is SAFE.`;
+      options = ["SAFE", "UNSAFE", "OVERLOADED", "EXCEEDS CAPACITY"].sort(() => Math.random() - 0.5);
+
+    } else {
+      const tons = 5;
+      const lbs = tons * 2000;
+      correctAnswerStr = `${lbs.toLocaleString()} lbs`;
+      promptText = `A crane shackle pin is stamped with a Working Load Limit (WLL) of 5 tons. Convert this rating to pounds.`;
+      explanationStr = `5 tons × 2,000 lbs/ton = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `5,000 lbs`, `12,000 lbs`, `8,000 lbs`].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_swl_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "SAFE_WORKING_LOAD_CAPACITY",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 08_RectangularVolumeGenerator.js
+// =========================================================
+/**
+ * Module 8: Rectangular Volume Generator (OETT Local 12)
+ * Calculates 3D volumes (V = L × W × H) and converts to cubic yards.
+ */
+class RectangularVolumeGenerator {
+  constructor() {
+    this.pools = ['TIER_1_CUBIC_FEET_DIRECT', 'TIER_2_CUBIC_YARDS_CONVERSION', 'TIER_3_MIXED_INCH_FOOT_VOLUMES'];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_CUBIC_FEET_DIRECT') {
+      const l = 10, w = 6, h = 4;
+      const cuFt = l * w * h;
+      correctAnswerStr = `${cuFt} cu ft`;
+      promptText = `An excavation trench box measures 10 feet long, 6 feet wide, and 4 feet deep. Calculate the volume of soil excavated in cubic feet.`;
+      explanationStr = `Volume = 10 ft × 6 ft × 4 ft = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `${cuFt + 40} cu ft`, `${l + w + h} cu ft`, `120 cu ft`].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_CUBIC_YARDS_CONVERSION') {
+      const l = 27, w = 10, h = 3;
+      const cuFt = l * w * h; // 810
+      const cuYds = cuFt / 27; // 30
+      correctAnswerStr = `${cuYds} cu yds`;
+      promptText = `A dump truck bed excavation measures 27 feet long, 10 feet wide, and 3 feet deep. Convert the total volume into cubic yards (cu yds).`;
+      explanationStr = `Volume = 27 × 10 × 3 = 810 cu ft. 810 ÷ 27 cu ft/cu yd = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `810 cu yds`, `300 cu yds`, `15 cu yds`].sort(() => Math.random() - 0.5);
+
+    } else {
+      const l_ft = 12, w_ft = 10;
+      const h_in = 6; // 0.5 ft
+      const cuFt = l_ft * w_ft * (h_in / 12); // 60
+      const cuYds = (cuFt / 27).toFixed(2);
+      correctAnswerStr = `${cuYds} cu yds`;
+      promptText = `A concrete slab form measures 12 feet long by 10 feet wide with a slab thickness of 6 inches. How many cubic yards of concrete are needed?`;
+      explanationStr = `Thickness = 6" ÷ 12 = 0.5 ft. Volume = 12 × 10 × 0.5 = 60 cu ft. 60 ÷ 27 = ${correctAnswerStr} cu yds.`;
+      options = [correctAnswerStr, `60.00 cu yds`, `2.22 cu yds`, `14.40 cu yds`].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_vol_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "RECTANGULAR_VOLUME",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 09_DecimalFractionEquivalenceGenerator.js
+// =========================================================
+/**
+ * Module 9: Decimal Fraction Equivalence Generator (OETT Local 12)
+ * Bi-directional decimal to mixed fraction conversions across quarters, 8ths, 16ths, 5ths.
+ */
+class DecimalFractionEquivalenceGenerator {
+  constructor() {
+    this.pools = ['TIER_1_QUARTERS_AND_HALVES', 'TIER_2_EIGHTHS_AND_SIXTEENTHS', 'TIER_3_FIFTHS_AND_DECIMAL_FEET'];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_QUARTERS_AND_HALVES') {
+      const dec = 3.75;
+      correctAnswerStr = "3 3/4";
+      promptText = `Convert the decimal reading 3.75 inches into a mixed fraction in lowest terms.`;
+      explanationStr = `0.75 = 75/100 = 3/4. Therefore, 3.75 = 3 3/4 inches.`;
+      options = ["3 3/4", "3 1/2", "3 5/8", "3 7/10"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_EIGHTHS_AND_SIXTEENTHS') {
+      const dec = 5.625;
+      correctAnswerStr = "5 5/8";
+      promptText = `Convert the machine shim tolerance reading 5.625 inches into a reduced mixed fraction.`;
+      explanationStr = `0.625 = 625/1000 = 5/8. Therefore, 5.625 = 5 5/8 inches.`;
+      options = ["5 5/8", "5 3/8", "5 11/16", "5 5/16"].sort(() => Math.random() - 0.5);
+
+    } else {
+      const fracStr = "12 2/5";
+      correctAnswerStr = "12.4";
+      promptText = `Convert the mixed fraction 12 2/5 feet into an equivalent decimal number.`;
+      explanationStr = `2 ÷ 5 = 0.4. Therefore, 12 2/5 = 12.4 feet.`;
+      options = ["12.4", "12.25", "12.2", "12.6"].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_eq_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "DECIMAL_FRACTION_EQUIVALENCE",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 10_WeightedGroupAverageGenerator.js
+// =========================================================
+/**
+ * Module 10: Weighted Group Average Generator (OETT Local 12)
+ * Combined group weighted averages across cargo shipments and material pallets.
+ */
+class WeightedGroupAverageGenerator {
+  constructor() {
+    this.pools = ['TIER_1_TWO_GROUP_CARGO_AVERAGE', 'TIER_2_THREE_GROUP_PALLET_AVERAGE', 'TIER_3_EQUIPMENT_FLEET_WEIGHTED_HOURS'];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_TWO_GROUP_CARGO_AVERAGE') {
+      // 4 pallets at 250 lbs, 6 pallets at 400 lbs
+      const n1 = 4, w1 = 250;
+      const n2 = 6, w2 = 400;
+      const totalW = (n1 * w1) + (n2 * w2); // 1000 + 2400 = 3400
+      const totalN = n1 + n2; // 10
+      const avg = totalW / totalN; // 340
+      correctAnswerStr = `${avg} lbs`;
+      promptText = `A freight shipment contains 4 pallets weighing 250 lbs each and 6 pallets weighing 400 lbs each. What is the weighted average weight per pallet?`;
+      explanationStr = `Total Weight = (4 × 250) + (6 × 400) = 1,000 + 2,400 = 3,400 lbs. Total Pallets = 10. Average = 3,400 ÷ 10 = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `325 lbs`, `350 lbs`, `300 lbs`].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_THREE_GROUP_PALLET_AVERAGE') {
+      const n1 = 2, w1 = 100;
+      const n2 = 3, w2 = 200;
+      const n3 = 5, w3 = 300;
+      const totalW = (n1 * w1) + (n2 * w2) + (n3 * w3); // 200 + 600 + 1500 = 2300
+      const totalN = n1 + n2 + n3; // 10
+      const avg = totalW / totalN; // 230
+      correctAnswerStr = `${avg} lbs`;
+      promptText = `A machinery supplier ships 2 boxes at 100 lbs ea, 3 boxes at 200 lbs ea, and 5 boxes at 300 lbs ea. What is the weighted average weight per box?`;
+      explanationStr = `Total Weight = 200 + 600 + 1,500 = 2,300 lbs. Total Boxes = 10. Average = 2,300 ÷ 10 = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `200 lbs`, `250 lbs`, `210 lbs`].sort(() => Math.random() - 0.5);
+
+    } else {
+      const n1 = 5, h1 = 8;
+      const n2 = 5, h2 = 12;
+      const avg = ((n1 * h1) + (n2 * h2)) / (n1 + n2); // 10
+      correctAnswerStr = `${avg} hours`;
+      promptText = `An earthmoving fleet operates 5 excavators for 8 hours/day and 5 dozers for 12 hours/day. What is the average daily operating hours per machine?`;
+      explanationStr = `Total Hours = (5 × 8) + (5 × 12) = 40 + 60 = 100 hours. Total Machines = 10. Average = 100 ÷ 10 = ${correctAnswerStr}.`;
+      options = [correctAnswerStr, `10.5 hours`, `9.5 hours`, `11 hours`].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_wavg_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "WEIGHTED_GROUP_AVERAGE",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 11_MultiTermFractionSummationGenerator.js
+// =========================================================
+/**
+ * Module 11: Multi-Term Fraction Summation Generator (OETT Local 12)
+ * Multi-term fraction and mixed-number additions across LCDs of 16, 24, 30.
+ */
+class MultiTermFractionSummationGenerator {
+  constructor() {
+    this.pools = ['TIER_1_FOUR_TERM_INCH_FRACTIONS', 'TIER_2_FIVE_TERM_LCD24_30_SUMS', 'TIER_3_MIXED_NUMBER_BOOM_CLEARANCE'];
+  }
+
+  gcd(a, b) { return b === 0 ? a : this.gcd(b, a % b); }
+
+  reduceFraction(num, den) {
+    const g = this.gcd(Math.abs(num), Math.abs(den));
+    let n = num / g, d = den / g;
+    const w = Math.floor(n / d);
+    n = n % d;
+    if (w > 0 && n > 0) return `${w} ${n}/${d}`;
+    if (w > 0 && n === 0) return `${w}`;
+    return `${n}/${d}`;
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_FOUR_TERM_INCH_FRACTIONS') {
+      // 1/2 + 3/8 + 5/16 + 1/4 = 8/16 + 6/16 + 5/16 + 4/16 = 23/16 = 1 7/16
+      correctAnswerStr = "1 7/16";
+      promptText = `Add the following four fractional shim measurements: ½ + ⅜ + 5/16 + ¼ inches. What is the total combined sum?`;
+      explanationStr = `Convert to common denominator 16: 8/16 + 6/16 + 5/16 + 4/16 = 23/16 = 1 7/16 inches.`;
+      options = ["1 7/16", "1 5/16", "1 9/16", "1 3/8"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_FIVE_TERM_LCD24_30_SUMS') {
+      // 1/3 + 1/4 + 1/6 + 1/8 = 8/24 + 6/24 + 4/24 + 3/24 = 21/24 = 7/8
+      correctAnswerStr = "7/8";
+      promptText = `Add the four fractional offset values: ⅓ + ¼ + 1/6 + ⅛ inches.`;
+      explanationStr = `LCD = 24. 8/24 + 6/24 + 4/24 + 3/24 = 21/24 = 7/8 inches.`;
+      options = ["7/8", "3/4", "13/16", "15/16"].sort(() => Math.random() - 0.5);
+
+    } else {
+      // 2 1/2 + 1 3/4 + 3 1/8 = 2 4/8 + 1 6/8 + 3 1/8 = 6 11/8 = 7 3/8
+      correctAnswerStr = "7 3/8";
+      promptText = `An excavator boom extension uses three clearance spacers measuring 2½ ft, 1¾ ft, and 3⅛ ft. What is the total combined length?`;
+      explanationStr = `Convert fractions to 8ths: 2 4/8 + 1 6/8 + 3 1/8 = 6 11/8 = 7 3/8 feet.`;
+      options = ["7 3/8", "7 1/4", "7 5/8", "6 7/8"].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_multi_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "MULTI_TERM_FRACTION_SUMMATION",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 12_BulkGroupDozenConversionGenerator.js
+// =========================================================
+/**
+ * Module 12: Bulk Group & Dozen Unit Conversion Generator (OETT Local 12)
+ * Converts trade packaging units (dozens, gross, cases, cartons) into total individual item counts.
+ */
+class BulkGroupDozenConversionGenerator {
+  constructor() {
+    this.pools = [
+      'TIER_1_STANDARD_DOZENS',
+      'TIER_2_FRACTIONAL_MIXED_DOZENS',
+      'TIER_3_TRADE_GROSS_UNITS',
+      'TIER_4_TRADE_CASES_CARTONS'
+    ];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_STANDARD_DOZENS') {
+      const dozenCount = 5;
+      const total = dozenCount * 12; // 60
+      correctAnswerStr = `${total}`;
+      promptText = `An Operating Engineer project order requires 5 dozen pieces of 2x4 shoring lumber. How many individual pieces were ordered?`;
+      explanationStr = `1 dozen = 12 items. 5 dozen × 12 items/dozen = 60 individual pieces.`;
+      options = ["60", "17", "50", "72"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_FRACTIONAL_MIXED_DOZENS') {
+      const wholeDozen = 3; // 3.5 dozen
+      const total = (3 * 12) + 6; // 42
+      correctAnswerStr = `${total}`;
+      promptText = `A jobsite supply requisition calls for 3½ dozen heavy-duty rigging shackle pins. How many total individual pins does this equal?`;
+      explanationStr = `3½ dozen = (3 × 12) + 6 = 36 + 6 = 42 individual items.`;
+      options = ["42", "36", "41", "48"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_3_TRADE_GROSS_UNITS') {
+      const grossCount = 2;
+      const total = grossCount * 144; // 288
+      correctAnswerStr = `${total}`;
+      promptText = `An equipment repair shop orders 2 gross of hydraulic O-ring seals. How many individual O-rings are in this order? (Note: 1 gross = 12 dozen = 144 items).`;
+      explanationStr = `1 gross = 144 items. 2 gross × 144 items/gross = 288 individual items.`;
+      options = ["288", "24", "200", "144"].sort(() => Math.random() - 0.5);
+
+    } else {
+      const cases = 4;
+      const pack = 24;
+      const total = cases * pack; // 96
+      correctAnswerStr = `${total}`;
+      promptText = `A field mechanics truck receives 4 cases of hard-facing welding electrodes, with each case containing 24 electrodes. What is the total count of individual electrodes?`;
+      explanationStr = `4 cases × 24 items/case = 96 individual items.`;
+      options = ["96", "28", "100", "80"].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_dozen_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "BULK_GROUP_DOZEN_CONVERSION",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 13_FractionalRateThreadPitchGenerator.js
+// =========================================================
+/**
+ * Module 13: Fractional Rate & Thread Pitch Density Generator (OETT Local 12)
+ * Calculates total counts over linear spans given fractional density rates.
+ */
+class FractionalRateThreadPitchGenerator {
+  constructor() {
+    this.pools = [
+      'TIER_1_FASTENER_THREADS',
+      'TIER_2_CABLE_DRUM_WRAPS',
+      'TIER_3_REBAR_AND_GROUSER_PITCH'
+    ];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_FASTENER_THREADS') {
+      // 3 threads per 1/8" over 4 inches -> (4 / (1/8)) * 3 = 32 * 3 = 96
+      correctAnswerStr = "96 threads";
+      promptText = `There are 3 threads in each ⅛ inch of a heavy-duty hydraulic cylinder bolt. How many total threads are on a 4-inch bolt?`;
+      explanationStr = `1. Segments in 4 inches = 4 ÷ (1/8) = 32 segments. 2. Total threads = 32 × 3 = 96 threads.`;
+      options = ["96 threads", "12 threads", "24 threads", "32 threads"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_CABLE_DRUM_WRAPS') {
+      // 4 wraps per 1/2" over 12" -> 24 * 4 = 96
+      correctAnswerStr = "96 wraps";
+      promptText = `A crane winch drum winds 4 cable wraps for every ½ inch of drum face width. How many total wraps are on a 12-inch wide drum face?`;
+      explanationStr = `1. ½-inch segments in 12" = 12 × 2 = 24. 2. Total wraps = 24 × 4 = 96 wraps.`;
+      options = ["96 wraps", "48 wraps", "24 wraps", "100 wraps"].sort(() => Math.random() - 0.5);
+
+    } else {
+      // 3 ties per 1/4 ft over 8 ft -> (8 * 4) * 3 = 96
+      correctAnswerStr = "96 ties";
+      promptText = `Along a concrete footing rebar cage, steel stirrup ties are placed at a rate of 3 ties per ¼ foot. How many total ties are installed over an 8-foot section?`;
+      explanationStr = `1. ¼-ft segments in 8 ft = 8 × 4 = 32 segments. 2. Total ties = 32 × 3 = 96 ties.`;
+      options = ["96 ties", "24 ties", "32 ties", "120 ties"].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_rate_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "FRACTIONAL_RATE_THREAD_PITCH",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 14_CompositeCutoutAreaGenerator.js
+// =========================================================
+/**
+ * Module 14: Composite Cutout Area Generator (OETT Local 12)
+ * Calculates net surface area for templates with cutouts. Generates Method 1 Inline SVG diagrams.
+ */
+class CompositeCutoutAreaGenerator {
+  constructor() {
+    this.pools = ['TIER_1_SAME_UNITS_DIRECT', 'TIER_2_MIXED_UNITS_INCH_FOOT', 'TIER_3_MULTIPLE_UTILITY_CUTOUTS'];
+  }
+
+  generateSVGDiagram(outerW, outerH, cutW, cutH, outerUnit, cutUnit) {
+    return `<svg width="320" height="200" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; display:block; margin:10px auto;"><rect x="40" y="30" width="240" height="130" fill="#dbeafe" stroke="#1e3a8a" stroke-width="2.5" /><rect x="110" y="70" width="100" height="50" fill="#ffffff" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,4" /><text x="160" y="180" text-anchor="middle" font-weight="bold" fill="#1e3a8a" font-size="12">${outerW} ${outerUnit}</text><text x="25" y="100" text-anchor="middle" font-weight="bold" fill="#1e3a8a" font-size="12" transform="rotate(-90 25 100)">${outerH} ${outerUnit}</text><text x="160" y="100" text-anchor="middle" font-weight="bold" fill="#dc2626" font-size="11">CUTOUT: ${cutW} ${cutUnit} × ${cutH} ${cutUnit}</text></svg>`;
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '', diagramSvg = '';
+    let options = [];
+
+    if (type === 'TIER_1_SAME_UNITS_DIRECT') {
+      const outerW = 12, outerH = 10, cutW = 7, cutH = 2;
+      const net = (outerW * outerH) - (cutW * cutH); // 120 - 14 = 106
+      correctAnswerStr = `${net} m²`;
+      promptText = `A steel trench cover plate measures 12 meters long by 10 meters wide. A rectangular utility cutout measuring 7 meters long by 2 meters wide is removed from the center. What is the net surface area of the remaining plate?`;
+      explanationStr = `1. Outer Area = 12 × 10 = 120 m². 2. Cutout Area = 7 × 2 = 14 m². 3. Net Surface Area = 120 - 14 = 106 m².`;
+      diagramSvg = this.generateSVGDiagram(outerW, outerH, cutW, cutH, 'm', 'm');
+      options = ["106 m²", "120 m²", "14 m²", "134 m²"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_MIXED_UNITS_INCH_FOOT') {
+      // 1 ft x 1 ft -> 144 in², cutout 6" x 6" -> 36 in², net 108 in²
+      correctAnswerStr = "108 in²";
+      promptText = `A deck plate template measures 1 foot long by 1 foot wide. A square access opening measuring 6 inches by 6 inches is cut out. What is the remaining surface area in square inches (in²)?`;
+      explanationStr = `1. Outer Area = 12" × 12" = 144 in². 2. Cutout Area = 6" × 6" = 36 in². 3. Net Area = 144 - 36 = 108 in².`;
+      diagramSvg = this.generateSVGDiagram(1, 1, 6, 6, 'ft', 'in');
+      options = ["108 in²", "108 ft²", "144 in²", "36 in²"].sort(() => Math.random() - 0.5);
+
+    } else {
+      const outerW = 14, outerH = 9, cutW = 5, cutH = 5;
+      const net = (outerW * outerH) - (cutW * cutH); // 126 - 25 = 101
+      correctAnswerStr = `${net} m²`;
+      promptText = `A precast panel measures 14 meters by 9 meters. A square cutout measuring 5 meters by 5 meters is removed. What is the remaining surface area?`;
+      explanationStr = `1. Outer Area = 14 × 9 = 126 m². 2. Cutout = 5 × 5 = 25 m². 3. Net Area = 126 - 25 = 101 m².`;
+      diagramSvg = this.generateSVGDiagram(outerW, outerH, cutW, cutH, 'm', 'm');
+      options = ["101 m²", "126 m²", "25 m²", "151 m²"].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_cutout_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "COMPOSITE_CUTOUT_AREA",
+      internalType: type,
+      prompt: promptText,
+      diagramSvg: diagramSvg,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 15_ToleranceRangeAcceptableValueGenerator.js
+// =========================================================
+/**
+ * Module 15: Tolerance Range & Acceptable Value Generator (OETT Local 12)
+ * Calculates minimum and maximum acceptable values given a target calculation and jobsite tolerance.
+ */
+class ToleranceRangeAcceptableValueGenerator {
+  constructor() {
+    this.pools = ['TIER_1_SURVEY_GRADE_OFFSETS', 'TIER_2_MECHANICAL_PIN_TOLERANCES', 'TIER_3_PAYLOAD_BATCH_TOLERANCES'];
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '';
+    let options = [];
+
+    if (type === 'TIER_1_SURVEY_GRADE_OFFSETS') {
+      const target = 102.0375;
+      const tol = 0.125;
+      const maxVal = (target + tol).toFixed(4); // 102.1625
+      const minVal = (target - tol).toFixed(4); // 101.9125
+      correctAnswerStr = maxVal;
+      promptText = `A survey grade checker measures a target subgrade elevation of 102.0375 feet. If the jobsite tolerance is ± 0.125 feet, what is the maximum acceptable elevation?`;
+      explanationStr = `Maximum Acceptable Value = Target + Tolerance = 102.0375 + 0.125 = 102.1625 feet.`;
+      options = [maxVal, minVal, "102.2875", "102.0250"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_MECHANICAL_PIN_TOLERANCES') {
+      const target = 57.683;
+      const tol = 0.025;
+      const maxVal = (target + tol).toFixed(3); // 57.708
+      const minVal = (target - tol).toFixed(3); // 57.658
+      correctAnswerStr = maxVal;
+      promptText = `A hydraulic valve spool clearance measures 57.683 mm. If allowable tolerance is ± 0.025 mm, what is the maximum acceptable value?`;
+      explanationStr = `Maximum Value = Target + Tolerance = 57.683 + 0.025 = 57.708 mm.`;
+      options = [maxVal, minVal, "57.733", "57.695"].sort(() => Math.random() - 0.5);
+
+    } else {
+      const target = 102.0375;
+      const tol = 0.125;
+      const minVal = (target - tol).toFixed(4); // 101.9125
+      correctAnswerStr = minVal;
+      promptText = `If 102.0375 feet is an acceptable survey calculation with a tolerance of ± 0.125 feet, what is the minimum acceptable value?`;
+      explanationStr = `Minimum Value = Target - Tolerance = 102.0375 - 0.125 = 101.9125 feet.`;
+      options = [minVal, "102.1625", "101.7875", "102.0000"].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_tol_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "TOLERANCE_RANGE_ACCEPTABLE_VALUE",
+      internalType: type,
+      prompt: promptText,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 16_TabularDataLookupAverageGenerator.js
+// =========================================================
+/**
+ * Module 16: Tabular Data Lookup & Conditional Subset Average Generator (OETT Local 12)
+ * Generates dynamic tabular data lookups, single-cutoff filters, bounded interval filters,
+ * and parallel column delta averages with embedded HTML table payloads.
+ */
+class TabularDataLookupAverageGenerator {
+  constructor() {
+    this.pools = [
+      'TIER_1_FULL_COLUMN_AVERAGE',
+      'TIER_2_THRESHOLD_SUBSET_AVERAGE',
+      'TIER_3_BETWEEN_RANGE_SUBSET_AVERAGE',
+      'TIER_4_COLUMN_DELTA_AVERAGE'
+    ];
+
+    this.pipeTableData = [
+      { size: 0.50, sch40: 264,   sch80: 344 },
+      { size: 0.75, sch40: 362,   sch80: 487 },
+      { size: 1.00, sch40: 581,   sch80: 727 },
+      { size: 1.25, sch40: 859,   sch80: 878 },
+      { size: 1.50, sch40: 954,   sch80: 1225 },
+      { size: 2.00, sch40: 942,   sch80: 1542 },
+      { size: 2.50, sch40: 2093,  sch80: 2890 },
+      { size: 3.00, sch40: 2786,  sch80: 3839 },
+      { size: 4.00, sch40: 4119,  sch80: 5820 },
+      { size: 5.00, sch40: 5491,  sch80: 6864 },
+      { size: 6.00, sch40: 7165,  sch80: 11384 },
+      { size: 8.00, sch40: 10384, sch80: 17332 }
+    ];
+  }
+
+  buildPipeHtmlTable() {
+    let rowsHtml = this.pipeTableData.map(r => 
+      `<tr><td>${r.size.toFixed(2)}"</td><td>${r.sch40.toLocaleString()}</td><td>${r.sch80.toLocaleString()}</td></tr>`
+    ).join('');
+
+    return `<table class="oett-data-table" style="width:100%; border-collapse:collapse; margin:10px 0; text-align:center; font-size:14px;"><thead><tr style="background:#1e3a8a; color:#ffffff;"><th style="padding:6px; border:1px solid #cbd5e1;">Pipe Size</th><th style="padding:6px; border:1px solid #cbd5e1;">Schedule 40 Tensile</th><th style="padding:6px; border:1px solid #cbd5e1;">Schedule 80 Tensile</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '', tableHtml = '';
+    let options = [];
+
+    tableHtml = this.buildPipeHtmlTable();
+
+    if (type === 'TIER_1_FULL_COLUMN_AVERAGE') {
+      const sum = 35999;
+      const avg = (sum / 12).toFixed(1); // 3000.0 or 3000
+      correctAnswerStr = "3,000";
+      promptText = `Using the pipe specification table below, what is the average Schedule 40 tensile strength in pounds across all listed pipe sizes?`;
+      explanationStr = `Sum of Schedule 40 = 35,999 lbs. Total sizes = 12. Average = 35,999 ÷ 12 = 2,999.92 lbs ≈ 3,000 lbs.`;
+      options = ["3,000", "4,444.3", "2,500", "35,999"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_2_THRESHOLD_SUBSET_AVERAGE') {
+      const sum = 3962; // 264+362+581+859+954+942
+      const avg = (sum / 6).toFixed(1); // 660.3
+      correctAnswerStr = "660.3";
+      promptText = `Refer to the pipe specification table below. What is the average Schedule 40 tensile strength for pipe sizes less than 2.50"?`;
+      explanationStr = `Matching sizes (< 2.50"): 6 rows. Sum = 3,962 lbs. Subset Average = 3,962 ÷ 6 = 660.3 lbs.`;
+      options = ["660.3", "3,000", "1,200.5", "3,962"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_3_BETWEEN_RANGE_SUBSET_AVERAGE') {
+      // Schedule 80 for sizes between 1.25" and 4.00" inclusive -> 878+1225+1542+2890+3839+5820 = 16194 / 6 = 2699.0
+      correctAnswerStr = "2,699.0";
+      promptText = `For pipe sizes between 1.25" and 4.00" inclusive in the table below, what is the average Schedule 80 tensile strength?`;
+      explanationStr = `6 matching sizes. Sum = 16,194 lbs. Average = 16,194 ÷ 6 = 2,699.0 lbs.`;
+      options = ["2,699.0", "4,444.3", "2,100.5", "16,194"].sort(() => Math.random() - 0.5);
+
+    } else {
+      // Column Delta: Schedule 80 avg (4444.33) - Schedule 40 avg (2999.92) = 1444.4
+      correctAnswerStr = "1,444.4";
+      promptText = `What is the average increase in tensile strength (in lbs) when upgrading from Schedule 40 to Schedule 80 across all listed pipe sizes?`;
+      explanationStr = `Average Schedule 80 (4,444.3 lbs) - Average Schedule 40 (2,999.9 lbs) = 1,444.4 lbs.`;
+      options = ["1,444.4", "3,000.0", "4,444.3", "17,333.0"].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_table_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "TABULAR_DATA_LOOKUP_AVERAGE",
+      internalType: type,
+      prompt: promptText,
+      tableHtml: tableHtml,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+// =========================================================
+// FILE: 17_BarChartDataInterpretationGenerator.js
+// =========================================================
+/**
+ * Module 17: Bar Chart Data Interpretation Generator (OETT Local 12)
+ * Generates single-series and multi-series bar charts using Method 1 Inline SVG.
+ */
+class BarChartDataInterpretationGenerator {
+  constructor() {
+    this.pools = [
+      'TIER_1_YEARLY_SCALE_MULTIPLIER',
+      'TIER_2_MULTI_SERIES_CATEGORY_GROUP',
+      'TIER_3_MONTHLY_TIME_SUBSETS',
+      'TIER_4_FLEET_FUEL_AND_HOURS',
+      'TIER_5_EARTHWORK_YARDAGE_MOVEMENT',
+      'TIER_6_MACHINE_DOWNTIME_MAINTENANCE'
+    ];
+    this.heavyEquipmentList = ['Excavator', 'Dozer', 'Scraper', 'Motor Grader', 'Wheel Loader'];
+  }
+
+  getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  getRandomElement(arr) {
+    return arr[this.getRandomInt(0, arr.length - 1)];
+  }
+
+  generateSingleSeriesSVG(labels, values, yAxisLabel, barColor = '#16a34a') {
+    const svgW = 480, svgH = 250;
+    const padL = 60, padR = 20, padT = 35, padB = 40;
+    const chartW = svgW - padL - padR;
+    const chartH = svgH - padT - padB;
+
+    const maxVal = Math.max(...values) * 1.15 || 1;
+    const barWidth = (chartW / labels.length) * 0.55;
+    const barGap = chartW / labels.length;
+
+    let barsSvg = '';
+    let xLabelsSvg = '';
+
+    values.forEach((val, idx) => {
+      const bH = (val / maxVal) * chartH;
+      const bX = padL + (idx * barGap) + (barGap - barWidth) / 2;
+      const bY = padT + (chartH - bH);
+
+      barsSvg += `<rect x="${bX.toFixed(1)}" y="${bY.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bH.toFixed(1)}" fill="${barColor}" rx="3" />` +
+                 `<text x="${(bX + barWidth / 2).toFixed(1)}" y="${(bY - 6).toFixed(1)}" text-anchor="middle" font-weight="bold" fill="#1e293b" font-size="11">${val}</text>`;
+
+      xLabelsSvg += `<text x="${(bX + barWidth / 2).toFixed(1)}" y="${svgH - 12}" text-anchor="middle" fill="#475569" font-size="11" font-weight="600">${labels[idx]}</text>`;
+    });
+
+    return `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; display:block; margin:10px auto;">` +
+           `<text x="${padL}" y="20" text-anchor="start" font-weight="bold" fill="#1e3a8a" font-size="12">${yAxisLabel}</text>` +
+           `<line x1="${padL}" y1="${padT + chartH}" x2="${svgW - padR}" y2="${padT + chartH}" stroke="#94a3b8" stroke-width="1.5" />` +
+           `<line x1="${padL}" y1="${padT + (chartH * 0.5)}" x2="${svgW - padR}" y2="${padT + (chartH * 0.5)}" stroke="#e2e8f0" stroke-dasharray="4,4" />` +
+           `<line x1="${padL}" y1="${padT}" x2="${svgW - padR}" y2="${padT}" stroke="#e2e8f0" stroke-dasharray="4,4" />` +
+           `${barsSvg}${xLabelsSvg}</svg>`;
+  }
+
+  generateGroupedSeriesSVG(categories, series1, series2, legend1Name, legend2Name, yAxisLabel) {
+    const svgW = 500, svgH = 260;
+    const padL = 55, padR = 20, padT = 45, padB = 40;
+    const chartW = svgW - padL - padR;
+    const chartH = svgH - padT - padB;
+
+    const allVals = [...series1, ...series2];
+    const maxVal = Math.max(...allVals) * 1.15 || 1;
+
+    const groupWidth = chartW / categories.length;
+    const barWidth = groupWidth * 0.35;
+
+    let barsSvg = '';
+    let xLabelsSvg = '';
+
+    categories.forEach((cat, idx) => {
+      const gX = padL + (idx * groupWidth);
+      
+      const v1 = series1[idx];
+      const bH1 = (v1 / maxVal) * chartH;
+      const bX1 = gX + (groupWidth * 0.1);
+      const bY1 = padT + (chartH - bH1);
+
+      const v2 = series2[idx];
+      const bH2 = (v2 / maxVal) * chartH;
+      const bX2 = bX1 + barWidth + 3;
+      const bY2 = padT + (chartH - bH2);
+
+      barsSvg += `<rect x="${bX1.toFixed(1)}" y="${bY1.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bH1.toFixed(1)}" fill="#2563eb" rx="2" />` +
+                 `<text x="${(bX1 + barWidth / 2).toFixed(1)}" y="${(bY1 - 5).toFixed(1)}" text-anchor="middle" font-weight="bold" fill="#1e293b" font-size="10">${v1}</text>` +
+                 `<rect x="${bX2.toFixed(1)}" y="${bY2.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bH2.toFixed(1)}" fill="#f97316" rx="2" />` +
+                 `<text x="${(bX2 + barWidth / 2).toFixed(1)}" y="${(bY2 - 5).toFixed(1)}" text-anchor="middle" font-weight="bold" fill="#1e293b" font-size="10">${v2}</text>`;
+
+      xLabelsSvg += `<text x="${(gX + groupWidth / 2).toFixed(1)}" y="${svgH - 12}" text-anchor="middle" fill="#475569" font-size="11" font-weight="600">${cat}</text>`;
+    });
+
+    const legendSvg = `<g transform="translate(${svgW - 220}, 12)">` +
+                      `<rect x="0" y="0" width="12" height="12" fill="#2563eb" rx="2" />` +
+                      `<text x="18" y="10" font-size="11" fill="#334155" font-weight="bold">${legend1Name}</text>` +
+                      `<rect x="110" y="0" width="12" height="12" fill="#f97316" rx="2" />` +
+                      `<text x="128" y="10" font-size="11" fill="#334155" font-weight="bold">${legend2Name}</text>` +
+                      `</g>`;
+
+    return `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; display:block; margin:10px auto;">` +
+           `<text x="${padL}" y="22" text-anchor="start" font-weight="bold" fill="#1e3a8a" font-size="12">${yAxisLabel}</text>` +
+           `${legendSvg}` +
+           `<line x1="${padL}" y1="${padT + chartH}" x2="${svgW - padR}" y2="${padT + chartH}" stroke="#94a3b8" stroke-width="1.5" />` +
+           `${barsSvg}${xLabelsSvg}</svg>`;
+  }
+
+  generateSingleProblem(type) {
+    let promptText = '', correctAnswerStr = '', explanationStr = '', diagramSvg = '';
+    let options = [];
+
+    if (type === 'TIER_1_YEARLY_SCALE_MULTIPLIER') {
+      const years = ['1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002'];
+      const values = [25, 40, 60, 45, 65, 50, 75, 80];
+      const scaleMultiplier = 10000;
+      const unitStr = "tonnes";
+
+      diagramSvg = this.generateSingleSeriesSVG(years, values, "Production (in 10,000 tonnes)", "#16a34a");
+
+      const qTypes = ['AFTER_1999', 'PRIOR_1998', 'TOTAL'];
+      const selQ = this.getRandomElement(qTypes);
+
+      if (selQ === 'AFTER_1999') {
+        const matchingVals = [50, 75, 80];
+        const unscaledSum = matchingVals.reduce((a, b) => a + b, 0);
+        const totalScaled = unscaledSum * scaleMultiplier;
+
+        correctAnswerStr = `${totalScaled.toLocaleString()} ${unitStr}`;
+        promptText = "How many units were produced after 1999? (See chart below)";
+        explanationStr = `1. Values after 1999 (years 2000, 2001, 2002) = 50 + 75 + 80 = 205. 2. Account for Y-axis scale (× 10,000): 205 × 10,000 = ${correctAnswerStr}.`;
+
+        const dUnscaled = `${unscaledSum} ${unitStr}`;
+        const dWrongFilter = `${(235 * scaleMultiplier).toLocaleString()} ${unitStr}`;
+        const dOffByOne = `${(155 * scaleMultiplier).toLocaleString()} ${unitStr}`;
+
+        options = [correctAnswerStr, dUnscaled, dWrongFilter, dOffByOne].sort(() => Math.random() - 0.5);
+
+      } else if (selQ === 'PRIOR_1998') {
+        const matchingVals = [25, 40, 60];
+        const unscaledSum = matchingVals.reduce((a, b) => a + b, 0);
+        const totalScaled = unscaledSum * scaleMultiplier;
+
+        correctAnswerStr = `${totalScaled.toLocaleString()} ${unitStr}`;
+        promptText = "How many units were produced prior to 1998? (See chart below)";
+        explanationStr = `1. Values prior to 1998 (1995, 1996, 1997) = 25 + 40 + 60 = 125. 2. Scale (× 10,000): 125 × 10,000 = ${correctAnswerStr}.`;
+
+        const dUnscaled = `${unscaledSum} ${unitStr}`;
+        const dInclude1998 = `${(170 * scaleMultiplier).toLocaleString()} ${unitStr}`;
+
+        options = [correctAnswerStr, dUnscaled, dInclude1998, "2,050,000 tonnes"].sort(() => Math.random() - 0.5);
+
+      } else {
+        const unscaledSum = values.reduce((a, b) => a + b, 0);
+        const totalScaled = unscaledSum * scaleMultiplier;
+
+        correctAnswerStr = `${totalScaled.toLocaleString()} ${unitStr}`;
+        promptText = "How many total units were produced across all years shown in the chart below?";
+        explanationStr = `1. Sum of all bars = 25+40+60+45+65+50+75+80 = ${unscaledSum}. 2. Scale (× 10,000) = ${correctAnswerStr}.`;
+
+        options = [correctAnswerStr, `${unscaledSum} tonnes`, "3,040,000 tonnes", "2,050,000 tonnes"].sort(() => Math.random() - 0.5);
+      }
+
+    } else if (type === 'TIER_2_MULTI_SERIES_CATEGORY_GROUP') {
+      const groups = ['G1', 'G2', 'G3', 'G4', 'G5'];
+      const menScores = [20, 34, 30, 35, 27];
+      const womenScores = [25, 32, 34, 20, 25];
+
+      diagramSvg = this.generateGroupedSeriesSVG(groups, menScores, womenScores, "Men", "Women", "Scores");
+
+      const isWomen = Math.random() > 0.5;
+      const targetSeries = isWomen ? womenScores : menScores;
+      const targetLabel = isWomen ? "Women" : "Men";
+
+      const totalSum = targetSeries.reduce((a, b) => a + b, 0);
+      correctAnswerStr = `${totalSum}`;
+
+      promptText = `What was the total score of ${targetLabel} in all 5 groups? (See chart below)`;
+      explanationStr = `Sum of ${targetLabel} scores across G1 to G5 = ${targetSeries.join(' + ')} = ${totalSum}.`;
+
+      const dOtherSeries = `${(isWomen ? menScores : womenScores).reduce((a, b) => a + b, 0)}`;
+      const dAvg = `${(totalSum / 5).toFixed(1)}`;
+      const dOffByTen = `${totalSum - 10}`;
+
+      options = [correctAnswerStr, dOtherSeries, dAvg, dOffByTen].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_3_MONTHLY_TIME_SUBSETS') {
+      const months = ['July', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      const values = [200, 400, 150, 450, 500, 220];
+
+      diagramSvg = this.generateSingleSeriesSVG(months, values, "Production (*Units in Thousands)", "#0284c7");
+
+      const q1Sum = values[0] + values[1] + values[2];
+      const scaledTotal = q1Sum * 1000;
+
+      correctAnswerStr = `${scaledTotal.toLocaleString()} units`;
+      promptText = "How many units were produced in the first 3 months shown in the chart combined?";
+      explanationStr = `1. Sum of July + Feb + Mar = 200 + 400 + 150 = 750 (thousand). 2. Scale (× 1,000) = ${correctAnswerStr}.`;
+
+      const dUnscaled = `${q1Sum} units`;
+      const dTotalAllMonths = `${(values.reduce((a,b)=>a+b,0) * 1000).toLocaleString()} units`;
+
+      options = [correctAnswerStr, dUnscaled, dTotalAllMonths, "1,920,000 units"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_4_FLEET_FUEL_AND_HOURS') {
+      const machines = ['Excavator', 'Dozer', 'Scraper', 'Grader', 'Loader'];
+      const fuelRates = [18, 24, 32, 15, 22];
+      const operatingHours = [45, 50, 40, 38, 42];
+
+      diagramSvg = this.generateGroupedSeriesSVG(machines, fuelRates, operatingHours, "Fuel Rate (gal/hr)", "Weekly Hours", "Fleet Operations");
+
+      const sumFuel = fuelRates.reduce((a,b)=>a+b,0);
+      const avgFuel = (sumFuel / machines.length).toFixed(1);
+
+      correctAnswerStr = `${avgFuel} gal/hr`;
+      promptText = "Using the fleet operations chart below, what is the average hourly fuel consumption rate across all 5 heavy equipment types?";
+      explanationStr = `1. Total fuel rate sum = ${fuelRates.join(' + ')} = ${sumFuel} gal/hr. 2. Average = ${sumFuel} ÷ 5 = ${avgFuel} gal/hr.`;
+
+      const dSumOnly = `${sumFuel} gal/hr`;
+      const dHoursAvg = `${(operatingHours.reduce((a,b)=>a+b,0) / 5).toFixed(1)} gal/hr`;
+
+      options = [correctAnswerStr, dSumOnly, dHoursAvg, "18.5 gal/hr"].sort(() => Math.random() - 0.5);
+
+    } else if (type === 'TIER_5_EARTHWORK_YARDAGE_MOVEMENT') {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      const yardage = [45, 52, 60, 65, 80, 75];
+      const scaleMultiplier = 1000;
+
+      diagramSvg = this.generateSingleSeriesSVG(months, yardage, "Earthwork Moved (in 1,000 cu yds)", "#d97706");
+
+      const qTypes = ['Q1', 'Q2'];
+      const selQ = this.getRandomElement(qTypes);
+
+      if (selQ === 'Q2') {
+        const q2Sum = yardage[3] + yardage[4] + yardage[5];
+        const scaled = q2Sum * scaleMultiplier;
+        correctAnswerStr = `${scaled.toLocaleString()} cu yds`;
+        promptText = "What was the total volume of earthwork material moved during the second quarter (April, May, June)?";
+        explanationStr = `1. Sum of April + May + June = 65 + 80 + 75 = 220 (in 1,000 cu yds). 2. Total = 220 × 1,000 = ${correctAnswerStr}.`;
+        options = [correctAnswerStr, "220 cu yds", "157,000 cu yds", "377,000 cu yds"].sort(() => Math.random() - 0.5);
+      } else {
+        const q1Sum = yardage[0] + yardage[1] + yardage[2];
+        const scaled = q1Sum * scaleMultiplier;
+        correctAnswerStr = `${scaled.toLocaleString()} cu yds`;
+        promptText = "What was the total volume of earthwork material moved during the first quarter (January, February, March)?";
+        explanationStr = `1. Sum of Jan + Feb + Mar = 45 + 52 + 60 = 157 (in 1,000 cu yds). 2. Total = 157 × 1,000 = ${correctAnswerStr}.`;
+        options = [correctAnswerStr, "157 cu yds", "220,000 cu yds", "377,000 cu yds"].sort(() => Math.random() - 0.5);
+      }
+
+    } else {
+      const models = ['CAT 349', 'CAT D8T', 'CAT 621H', 'CAT 16M', 'CAT 980'];
+      const scheduledMaint = [12, 16, 20, 14, 18];
+      const unscheduledRepairs = [4, 15, 8, 3, 5];
+
+      diagramSvg = this.generateGroupedSeriesSVG(models, scheduledMaint, unscheduledRepairs, "Scheduled Maint (hrs)", "Unscheduled Repairs (hrs)", "Fleet Maintenance Hours");
+
+      const totalUnscheduled = unscheduledRepairs.reduce((a,b)=>a+b,0);
+      correctAnswerStr = `${totalUnscheduled} hours`;
+
+      promptText = "What was the total number of unscheduled repair hours incurred across all 5 machinery models?";
+      explanationStr = `Sum of unscheduled repair hours (orange bars) = 4 + 15 + 8 + 3 + 5 = ${totalUnscheduled} hours.`;
+
+      const dScheduledTotal = `${scheduledMaint.reduce((a,b)=>a+b,0)} hours`;
+      const dCombinedTotal = `${totalUnscheduled + scheduledMaint.reduce((a,b)=>a+b,0)} hours`;
+
+      options = [correctAnswerStr, dScheduledTotal, dCombinedTotal, "25 hours"].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      id: `oett12_chart_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`,
+      type: "BAR_CHART_DATA_INTERPRETATION",
+      internalType: type,
+      prompt: promptText,
+      diagramSvg: diagramSvg,
+      correctAnswer: correctAnswerStr,
+      options: options,
+      explanation: explanationStr,
+      points: 1
+    };
+  }
+
+  generateBatch(mode = 'MIXED', count = 5) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      let t = mode === 'MIXED' ? this.pools[i % this.pools.length] : mode;
+      list.push(this.generateSingleProblem(t));
+    }
+    return list.sort(() => Math.random() - 0.5);
+  }
+}
+
+    class OETTQuizEngineController {
+      constructor() {
+        this.generators = {
+          StackedMaterialThicknessGenerator: new StackedMaterialThicknessGenerator(),
+          BulkHardwareWeightGenerator: new BulkHardwareWeightGenerator(),
+          OperatingEngineersUnitConversionGenerator: new OperatingEngineersUnitConversionGenerator(),
+          RateBasedMaterialCostGenerator: new RateBasedMaterialCostGenerator(),
+          StackedMaterialQuantityGenerator: new StackedMaterialQuantityGenerator(),
+          CompositeAssemblyCostingGenerator: new CompositeAssemblyCostingGenerator(),
+          SafeWorkingLoadCapacityGenerator: new SafeWorkingLoadCapacityGenerator(),
+          RectangularVolumeGenerator: new RectangularVolumeGenerator(),
+          DecimalFractionEquivalenceGenerator: new DecimalFractionEquivalenceGenerator(),
+          WeightedGroupAverageGenerator: new WeightedGroupAverageGenerator(),
+          MultiTermFractionSummationGenerator: new MultiTermFractionSummationGenerator(),
+          BulkGroupDozenConversionGenerator: new BulkGroupDozenConversionGenerator(),
+          FractionalRateThreadPitchGenerator: new FractionalRateThreadPitchGenerator(),
+          CompositeCutoutAreaGenerator: new CompositeCutoutAreaGenerator(),
+          ToleranceRangeAcceptableValueGenerator: new ToleranceRangeAcceptableValueGenerator(),
+          TabularDataLookupAverageGenerator: new TabularDataLookupAverageGenerator(),
+          BarChartDataInterpretationGenerator: new BarChartDataInterpretationGenerator()
+        };
+
+        this.currentQuestions = [];
+        this.initUI();
+      }
+
+      initUI() {
+        const moduleSelect = document.getElementById('module-select');
+        const countInput = document.getElementById('count-input');
+        const countLimitLabel = document.getElementById('count-limit-label');
+        const generateBtn = document.getElementById('generate-quiz-btn');
+        const shareLinkBtn = document.getElementById('share-link-btn');
+        const quizForm = document.getElementById('quiz-form');
+
+        // Module selection change handler
+        moduleSelect.addEventListener('change', () => {
+          if (moduleSelect.value === 'FULL_ASSESSMENT') {
+            countInput.value = 22;
+            countInput.disabled = true;
+            countLimitLabel.textContent = '(Locked to 22 for Full Exam)';
+          } else {
+            countInput.disabled = false;
+            countInput.value = Math.min(Math.max(parseInt(countInput.value) || 5, 1), 25);
+            countLimitLabel.textContent = '(1 to 25 Questions)';
+          }
+        });
+
+        // Generate Quiz Button Click
+        generateBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.generateAndRenderQuiz();
+        });
+
+        // Copy Share Link Button Click
+        shareLinkBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.copyStudentShareLink();
+        });
+
+        // Quiz Submission Handler
+        quizForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.gradeAndSubmitQuiz();
+        });
+
+        // Check URL parameters for Student Mode
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'student' || window.location.hash.includes('quiz=')) {
+          document.getElementById('teacher-control-card').style.display = 'none';
+        }
+
+        // Initial Generation
+        this.generateAndRenderQuiz();
+      }
+
+      generateAndRenderQuiz() {
+        const moduleVal = document.getElementById('module-select').value;
+        const countVal = parseInt(document.getElementById('count-input').value) || 5;
+
+        if (moduleVal === 'FULL_ASSESSMENT') {
+          this.currentQuestions = this.generateFullAssessment();
+        } else {
+          const gen = this.generators[moduleVal];
+          if (gen) {
+            this.currentQuestions = gen.generateBatch('MIXED', countVal);
+          }
+        }
+
+        this.renderQuestions();
+      }
+
+      generateFullAssessment() {
+        const questions = [];
+        const moduleKeys = [
+          'StackedMaterialThicknessGenerator',
+          'BulkHardwareWeightGenerator',
+          'OperatingEngineersUnitConversionGenerator',
+          'RateBasedMaterialCostGenerator',
+          'StackedMaterialQuantityGenerator',
+          'CompositeAssemblyCostingGenerator',
+          'SafeWorkingLoadCapacityGenerator',
+          'RectangularVolumeGenerator',
+          'DecimalFractionEquivalenceGenerator',
+          'WeightedGroupAverageGenerator',
+          'MultiTermFractionSummationGenerator',
+          'BulkGroupDozenConversionGenerator',
+          'FractionalRateThreadPitchGenerator',
+          'CompositeCutoutAreaGenerator',
+          'ToleranceRangeAcceptableValueGenerator',
+          'TabularDataLookupAverageGenerator'
+        ];
+
+        // Questions 1 to 16: 1 from each of Modules 1 through 16
+        moduleKeys.forEach(key => {
+          const gen = this.generators[key];
+          if (gen) {
+            const batch = gen.generateBatch('MIXED', 1);
+            questions.push(batch[0]);
+          }
+        });
+
+        // Questions 17 to 22: Module 17 (Bar Chart Data) sampling 1 from each of its 6 tiers
+        const chartGen = this.generators['BarChartDataInterpretationGenerator'];
+        if (chartGen && chartGen.pools) {
+          chartGen.pools.forEach(tierName => {
+            const q = chartGen.generateSingleProblem(tierName);
+            questions.push(q);
+          });
+        }
+
+        return questions;
+      }
+
+      renderQuestions() {
+        const container = document.getElementById('quiz-questions-container');
+        const resultsBanner = document.getElementById('quiz-results-banner');
+        resultsBanner.classList.add('hidden');
+        resultsBanner.innerHTML = '';
+
+        container.innerHTML = '';
+
+        this.currentQuestions.forEach((q, idx) => {
+          const qCard = document.createElement('div');
+          qCard.className = 'oett-card p-6 space-y-4 border-l-4 border-blue-600';
+          qCard.id = `q-card-${idx}`;
+
+          let mediaHtml = '';
+          if (q.diagramSvg) {
+            mediaHtml = `<div class="my-3 text-center">${q.diagramSvg}</div>`;
+          } else if (q.tableHtml) {
+            mediaHtml = `<div class="my-3 overflow-x-auto">${q.tableHtml}</div>`;
+          }
+
+          let optionsHtml = q.options.map((opt, oIdx) => `
+            <label class="oett-option-label flex items-center p-3 border border-slate-200 rounded-lg space-x-3 text-sm font-semibold text-slate-800" id="opt-label-${idx}-${oIdx}">
+              <input type="radio" name="question-${idx}" value="${opt.replace(/"/g, '&quot;')}" class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+              <span class="flex-1">${opt}</span>
+            </label>
+          `).join('');
+
+          qCard.innerHTML = `
+            <div class="flex items-center justify-between text-xs font-bold text-slate-500 border-b pb-2">
+              <span>QUESTION ${idx + 1} OF ${this.currentQuestions.length}</span>
+              <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded">${q.type.replace(/_/g, ' ')}</span>
+            </div>
+            <div class="text-base font-bold text-slate-900 leading-relaxed">
+              ${q.prompt}
+            </div>
+            ${mediaHtml}
+            <div class="space-y-2 pt-2">
+              ${optionsHtml}
+            </div>
+            <div id="explanation-${idx}" class="hidden p-3 rounded-lg bg-slate-100 text-xs text-slate-700 border-l-4 border-slate-400 font-medium space-y-1">
+              <div class="font-bold text-slate-900">Step-by-Step Explanation:</div>
+              <div>${q.explanation}</div>
+            </div>
+          `;
+
+          container.appendChild(qCard);
+        });
+
+        // Trigger MathJax Typesetting
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise();
+        }
+      }
+
+      gradeAndSubmitQuiz() {
+        let score = 0;
+        const total = this.currentQuestions.length;
+
+        const firstName = document.getElementById('student-first-name').value.trim();
+        const lastName = document.getElementById('student-last-name').value.trim();
+
+        this.currentQuestions.forEach((q, idx) => {
+          const selected = document.querySelector(`input[name="question-${idx}"]:checked`);
+          const expBox = document.getElementById(`explanation-${idx}`);
+          expBox.classList.remove('hidden');
+
+          q.options.forEach((opt, oIdx) => {
+            const label = document.getElementById(`opt-label-${idx}-${oIdx}`);
+            label.classList.remove('correct-bg', 'incorrect-bg');
+
+            if (opt === q.correctAnswer) {
+              label.classList.add('correct-bg');
+            }
+          });
+
+          if (selected && selected.value === q.correctAnswer) {
+            score++;
+          } else if (selected) {
+            const selectedOptIdx = q.options.indexOf(selected.value);
+            if (selectedOptIdx !== -1) {
+              const selectedLabel = document.getElementById(`opt-label-${idx}-${selectedOptIdx}`);
+              selectedLabel.classList.add('incorrect-bg');
+            }
+          }
+        });
+
+        const percentage = Math.round((score / total) * 100);
+        const resultsBanner = document.getElementById('quiz-results-banner');
+        resultsBanner.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-900', 'bg-rose-100', 'text-rose-900');
+
+        if (percentage >= 70) {
+          resultsBanner.classList.add('bg-emerald-100', 'text-emerald-900');
+        } else {
+          resultsBanner.classList.add('bg-rose-100', 'text-rose-900');
+        }
+
+        const studentNameDisplay = (firstName || lastName) ? `Student: ${firstName} ${lastName} — ` : '';
+        resultsBanner.innerHTML = `
+          <div>${studentNameDisplay}Score: ${score} / ${total} (${percentage}%)</div>
+          <div class="text-xs font-normal mt-1">${percentage >= 70 ? '🎉 Passed OETT Assessment Benchmark' : '⚠️ Review Explanations & Retry Batch'}</div>
+        `;
+
+        // Send results to Google Sheets Script URL if provided
+        const scriptUrl = document.getElementById('script-url-input').value.trim();
+        if (scriptUrl) {
+          const payload = {
+            firstName: firstName || 'Anonymous',
+            lastName: lastName || 'Student',
+            score: score,
+            total: total,
+            percentage: percentage,
+            module: document.getElementById('module-select').value,
+            timestamp: new Date().toISOString()
+          };
+
+          fetch(scriptUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).catch(err => console.error("Error submitting to Google Sheets:", err));
+        }
+
+        // Scroll to results banner
+        resultsBanner.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      copyStudentShareLink() {
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('mode', 'student');
+        currentUrl.searchParams.set('module', document.getElementById('module-select').value);
+
+        navigator.clipboard.writeText(currentUrl.toString()).then(() => {
+          alert('🔗 Student Quiz Link copied to clipboard! Share this link with students to auto-open in Student Mode.');
+        }).catch(err => {
+          alert('Student Link: ' + currentUrl.toString());
+        });
+      }
+    }
+
+    // Initialize Quiz Engine Controller on Page Load
+    window.addEventListener('DOMContentLoaded', () => {
+      window.oettQuizEngine = new OETTQuizEngineController();
+    });
+  </script>
+</body>
+</html>
