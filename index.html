@@ -7,15 +7,15 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- MathJax 3 -->
-  <script>
-    window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']]
-      },
-      svg: { fontCache: 'global' }
-    };
-  </script>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
     body { background-color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; }
@@ -111,7 +111,10 @@
       </div>
     </div>
 
-    <!-- Student Info Card (Student Registration) -->
+    <!-- Active Assessment Container -->
+    <form id="quiz-form" class="space-y-6">
+
+  <!-- Student Info Card (Student Registration) -->
     <div id="student-info-card" class="oett-card p-6 space-y-4">
       <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
         👤 Student Identification
@@ -134,8 +137,6 @@
       </div>
     </div>
 
-    <!-- Active Assessment Container -->
-    <form id="quiz-form" class="space-y-6">
       <div id="quiz-questions-container" class="space-y-6">
         <!-- Dynamic Questions Rendered Here -->
       </div>
@@ -1317,97 +1318,114 @@ class BarChartDataInterpretationGenerator {
       'TIER_5_EARTHWORK_YARDAGE_MOVEMENT',
       'TIER_6_MACHINE_DOWNTIME_MAINTENANCE'
     ];
-    this.heavyEquipmentList = ['Excavator', 'Dozer', 'Scraper', 'Motor Grader', 'Wheel Loader'];
-  }
-
-  getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  getRandomElement(arr) {
-    return arr[this.getRandomInt(0, arr.length - 1)];
   }
 
   generateSingleSeriesSVG(labels, values, yAxisLabel, barColor = '#16a34a') {
-    const svgW = 480, svgH = 250;
-    const padL = 60, padR = 20, padT = 35, padB = 40;
-    const chartW = svgW - padL - padR;
-    const chartH = svgH - padT - padB;
+    const svgWidth = 480, svgHeight = 240;
+    const paddingLeft = 60, paddingBottom = 40, paddingTop = 35, paddingRight = 20;
+    const plotWidth = svgWidth - paddingLeft - paddingRight;
+    const plotHeight = svgHeight - paddingTop - paddingBottom;
 
-    const maxVal = Math.max(...values) * 1.15 || 1;
-    const barWidth = (chartW / labels.length) * 0.55;
-    const barGap = chartW / labels.length;
+    const maxVal = Math.max(...values, 1) * 1.15;
+    const numBars = labels.length;
+    const gap = 12;
+    const barWidth = Math.max(12, (plotWidth - (numBars + 1) * gap) / numBars);
 
-    let barsSvg = '';
-    let xLabelsSvg = '';
+    let barsHtml = '';
+    let gridHtml = '';
 
-    values.forEach((val, idx) => {
-      const bH = (val / maxVal) * chartH;
-      const bX = padL + (idx * barGap) + (barGap - barWidth) / 2;
-      const bY = padT + (chartH - bH);
+    const numGridLines = 4;
+    for (let i = 0; i <= numGridLines; i++) {
+      const gridVal = (maxVal * (i / numGridLines));
+      const yPos = svgHeight - paddingBottom - (plotHeight * (i / numGridLines));
+      gridHtml += `<line x1="${paddingLeft}" y1="${yPos}" x2="${svgWidth - paddingRight}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="3,3" />`;
+      gridHtml += `<text x="${paddingLeft - 8}" y="${yPos + 4}" text-anchor="end" fill="#64748b" font-size="10" font-family="sans-serif">${Math.round(gridVal)}</text>`;
+    }
 
-      barsSvg += `<rect x="${bX.toFixed(1)}" y="${bY.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bH.toFixed(1)}" fill="${barColor}" rx="3" />` +
-                 `<text x="${(bX + barWidth / 2).toFixed(1)}" y="${(bY - 6).toFixed(1)}" text-anchor="middle" font-weight="bold" fill="#1e293b" font-size="11">${val}</text>`;
+    labels.forEach((lbl, idx) => {
+      const val = values[idx];
+      const barH = (val / maxVal) * plotHeight;
+      const xPos = paddingLeft + gap + idx * (barWidth + gap);
+      const yPos = svgHeight - paddingBottom - barH;
 
-      xLabelsSvg += `<text x="${(bX + barWidth / 2).toFixed(1)}" y="${svgH - 12}" text-anchor="middle" fill="#475569" font-size="11" font-weight="600">${labels[idx]}</text>`;
+      barsHtml += `<rect x="${xPos}" y="${yPos}" width="${barWidth}" height="${barH}" fill="${barColor}" rx="3" ry="3" />`;
+      barsHtml += `<text x="${xPos + barWidth / 2}" y="${yPos - 5}" text-anchor="middle" fill="#1e293b" font-size="10" font-weight="bold" font-family="sans-serif">${val}</text>`;
+      barsHtml += `<text x="${xPos + barWidth / 2}" y="${svgHeight - paddingBottom + 15}" text-anchor="middle" fill="#475569" font-size="10" font-weight="600" font-family="sans-serif">${lbl}</text>`;
     });
 
-    return `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; display:block; margin:10px auto;">` +
-           `<text x="${padL}" y="20" text-anchor="start" font-weight="bold" fill="#1e3a8a" font-size="12">${yAxisLabel}</text>` +
-           `<line x1="${padL}" y1="${padT + chartH}" x2="${svgW - padR}" y2="${padT + chartH}" stroke="#94a3b8" stroke-width="1.5" />` +
-           `<line x1="${padL}" y1="${padT + (chartH * 0.5)}" x2="${svgW - padR}" y2="${padT + (chartH * 0.5)}" stroke="#e2e8f0" stroke-dasharray="4,4" />` +
-           `<line x1="${padL}" y1="${padT}" x2="${svgW - padR}" y2="${padT}" stroke="#e2e8f0" stroke-dasharray="4,4" />` +
-           `${barsSvg}${xLabelsSvg}</svg>`;
+    return `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; display:block; margin:10px auto;">
+      <text x="${paddingLeft}" y="20" font-weight="bold" fill="#1e3a8a" font-size="12" font-family="sans-serif">${yAxisLabel}</text>
+      ${gridHtml}
+      <line x1="${paddingLeft}" y1="${svgHeight - paddingBottom}" x2="${svgWidth - paddingRight}" y2="${svgHeight - paddingBottom}" stroke="#94a3b8" stroke-width="2" />
+      <line x1="${paddingLeft}" y1="${paddingTop}" x2="${paddingLeft}" y2="${svgHeight - paddingBottom}" stroke="#94a3b8" stroke-width="2" />
+      ${barsHtml}
+    </svg>`;
   }
 
   generateGroupedSeriesSVG(categories, series1, series2, legend1Name, legend2Name, yAxisLabel) {
-    const svgW = 500, svgH = 260;
-    const padL = 55, padR = 20, padT = 45, padB = 40;
-    const chartW = svgW - padL - padR;
-    const chartH = svgH - padT - padB;
+    const svgWidth = 480, svgHeight = 250;
+    const paddingLeft = 60, paddingBottom = 40, paddingTop = 45, paddingRight = 20;
+    const plotWidth = svgWidth - paddingLeft - paddingRight;
+    const plotHeight = svgHeight - paddingTop - paddingBottom;
 
-    const allVals = [...series1, ...series2];
-    const maxVal = Math.max(...allVals) * 1.15 || 1;
+    const allValues = [...series1, ...series2];
+    const maxVal = Math.max(...allValues, 1) * 1.15;
+    const numGroups = categories.length;
+    const groupGap = 16;
+    const groupWidth = (plotWidth - (numGroups + 1) * groupGap) / numGroups;
+    const barWidth = (groupWidth - 4) / 2;
 
-    const groupWidth = chartW / categories.length;
-    const barWidth = groupWidth * 0.35;
+    let barsHtml = '';
+    let gridHtml = '';
 
-    let barsSvg = '';
-    let xLabelsSvg = '';
+    const numGridLines = 4;
+    for (let i = 0; i <= numGridLines; i++) {
+      const gridVal = (maxVal * (i / numGridLines));
+      const yPos = svgHeight - paddingBottom - (plotHeight * (i / numGridLines));
+      gridHtml += `<line x1="${paddingLeft}" y1="${yPos}" x2="${svgWidth - paddingRight}" y2="${yPos}" stroke="#e2e8f0" stroke-dasharray="3,3" />`;
+      gridHtml += `<text x="${paddingLeft - 8}" y="${yPos + 4}" text-anchor="end" fill="#64748b" font-size="10" font-family="sans-serif">${Math.round(gridVal)}</text>`;
+    }
 
     categories.forEach((cat, idx) => {
-      const gX = padL + (idx * groupWidth);
-      
       const v1 = series1[idx];
-      const bH1 = (v1 / maxVal) * chartH;
-      const bX1 = gX + (groupWidth * 0.1);
-      const bY1 = padT + (chartH - bH1);
-
       const v2 = series2[idx];
-      const bH2 = (v2 / maxVal) * chartH;
-      const bX2 = bX1 + barWidth + 3;
-      const bY2 = padT + (chartH - bH2);
 
-      barsSvg += `<rect x="${bX1.toFixed(1)}" y="${bY1.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bH1.toFixed(1)}" fill="#2563eb" rx="2" />` +
-                 `<text x="${(bX1 + barWidth / 2).toFixed(1)}" y="${(bY1 - 5).toFixed(1)}" text-anchor="middle" font-weight="bold" fill="#1e293b" font-size="10">${v1}</text>` +
-                 `<rect x="${bX2.toFixed(1)}" y="${bY2.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bH2.toFixed(1)}" fill="#f97316" rx="2" />` +
-                 `<text x="${(bX2 + barWidth / 2).toFixed(1)}" y="${(bY2 - 5).toFixed(1)}" text-anchor="middle" font-weight="bold" fill="#1e293b" font-size="10">${v2}</text>`;
+      const bar1H = (v1 / maxVal) * plotHeight;
+      const bar2H = (v2 / maxVal) * plotHeight;
 
-      xLabelsSvg += `<text x="${(gX + groupWidth / 2).toFixed(1)}" y="${svgH - 12}" text-anchor="middle" fill="#475569" font-size="11" font-weight="600">${cat}</text>`;
+      const groupX = paddingLeft + groupGap + idx * (groupWidth + groupGap);
+      const x1 = groupX;
+      const x2 = groupX + barWidth + 4;
+
+      const y1 = svgHeight - paddingBottom - bar1H;
+      const y2 = svgHeight - paddingBottom - bar2H;
+
+      barsHtml += `<rect x="${x1}" y="${y1}" width="${barWidth}" height="${bar1H}" fill="#2563eb" rx="2" ry="2" />`;
+      barsHtml += `<text x="${x1 + barWidth / 2}" y="${y1 - 4}" text-anchor="middle" fill="#1e293b" font-size="9" font-weight="bold" font-family="sans-serif">${v1}</text>`;
+
+      barsHtml += `<rect x="${x2}" y="${y2}" width="${barWidth}" height="${bar2H}" fill="#f59e0b" rx="2" ry="2" />`;
+      barsHtml += `<text x="${x2 + barWidth / 2}" y="${y2 - 4}" text-anchor="middle" fill="#1e293b" font-size="9" font-weight="bold" font-family="sans-serif">${v2}</text>`;
+
+      barsHtml += `<text x="${groupX + groupWidth / 2}" y="${svgHeight - paddingBottom + 16}" text-anchor="middle" fill="#475569" font-size="10" font-weight="600" font-family="sans-serif">${cat}</text>`;
     });
 
-    const legendSvg = `<g transform="translate(${svgW - 220}, 12)">` +
-                      `<rect x="0" y="0" width="12" height="12" fill="#2563eb" rx="2" />` +
-                      `<text x="18" y="10" font-size="11" fill="#334155" font-weight="bold">${legend1Name}</text>` +
-                      `<rect x="110" y="0" width="12" height="12" fill="#f97316" rx="2" />` +
-                      `<text x="128" y="10" font-size="11" fill="#334155" font-weight="bold">${legend2Name}</text>` +
-                      `</g>`;
+    const legendHtml = `
+      <g transform="translate(${svgWidth - 170}, 12)">
+        <rect x="0" y="0" width="12" height="12" fill="#2563eb" rx="2" />
+        <text x="16" y="10" fill="#334155" font-size="10" font-weight="bold" font-family="sans-serif">${legend1Name}</text>
+        <rect x="80" y="0" width="12" height="12" fill="#f59e0b" rx="2" />
+        <text x="96" y="10" fill="#334155" font-size="10" font-weight="bold" font-family="sans-serif">${legend2Name}</text>
+      </g>
+    `;
 
-    return `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; display:block; margin:10px auto;">` +
-           `<text x="${padL}" y="22" text-anchor="start" font-weight="bold" fill="#1e3a8a" font-size="12">${yAxisLabel}</text>` +
-           `${legendSvg}` +
-           `<line x1="${padL}" y1="${padT + chartH}" x2="${svgW - padR}" y2="${padT + chartH}" stroke="#94a3b8" stroke-width="1.5" />` +
-           `${barsSvg}${xLabelsSvg}</svg>`;
+    return `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; display:block; margin:10px auto;">
+      <text x="${paddingLeft}" y="22" font-weight="bold" fill="#1e3a8a" font-size="12" font-family="sans-serif">${yAxisLabel}</text>
+      ${legendHtml}
+      ${gridHtml}
+      <line x1="${paddingLeft}" y1="${svgHeight - paddingBottom}" x2="${svgWidth - paddingRight}" y2="${svgHeight - paddingBottom}" stroke="#94a3b8" stroke-width="2" />
+      <line x1="${paddingLeft}" y1="${paddingTop}" x2="${paddingLeft}" y2="${svgHeight - paddingBottom}" stroke="#94a3b8" stroke-width="2" />
+      ${barsHtml}
+    </svg>`;
   }
 
   generateSingleProblem(type) {
@@ -1417,157 +1435,65 @@ class BarChartDataInterpretationGenerator {
     if (type === 'TIER_1_YEARLY_SCALE_MULTIPLIER') {
       const years = ['1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002'];
       const values = [25, 40, 60, 45, 65, 50, 75, 80];
-      const scaleMultiplier = 10000;
-      const unitStr = "tonnes";
+      diagramSvg = this.generateSingleSeriesSVG(years, values, "Production (in 10,000 tonnes)", "#2563eb");
 
-      diagramSvg = this.generateSingleSeriesSVG(years, values, "Production (in 10,000 tonnes)", "#16a34a");
-
-      const qTypes = ['AFTER_1999', 'PRIOR_1998', 'TOTAL'];
-      const selQ = this.getRandomElement(qTypes);
-
-      if (selQ === 'AFTER_1999') {
-        const matchingVals = [50, 75, 80];
-        const unscaledSum = matchingVals.reduce((a, b) => a + b, 0);
-        const totalScaled = unscaledSum * scaleMultiplier;
-
-        correctAnswerStr = `${totalScaled.toLocaleString()} ${unitStr}`;
-        promptText = "How many units were produced after 1999? (See chart below)";
-        explanationStr = `1. Values after 1999 (years 2000, 2001, 2002) = 50 + 75 + 80 = 205. 2. Account for Y-axis scale (× 10,000): 205 × 10,000 = ${correctAnswerStr}.`;
-
-        const dUnscaled = `${unscaledSum} ${unitStr}`;
-        const dWrongFilter = `${(235 * scaleMultiplier).toLocaleString()} ${unitStr}`;
-        const dOffByOne = `${(155 * scaleMultiplier).toLocaleString()} ${unitStr}`;
-
-        options = [correctAnswerStr, dUnscaled, dWrongFilter, dOffByOne].sort(() => Math.random() - 0.5);
-
-      } else if (selQ === 'PRIOR_1998') {
-        const matchingVals = [25, 40, 60];
-        const unscaledSum = matchingVals.reduce((a, b) => a + b, 0);
-        const totalScaled = unscaledSum * scaleMultiplier;
-
-        correctAnswerStr = `${totalScaled.toLocaleString()} ${unitStr}`;
-        promptText = "How many units were produced prior to 1998? (See chart below)";
-        explanationStr = `1. Values prior to 1998 (1995, 1996, 1997) = 25 + 40 + 60 = 125. 2. Scale (× 10,000): 125 × 10,000 = ${correctAnswerStr}.`;
-
-        const dUnscaled = `${unscaledSum} ${unitStr}`;
-        const dInclude1998 = `${(170 * scaleMultiplier).toLocaleString()} ${unitStr}`;
-
-        options = [correctAnswerStr, dUnscaled, dInclude1998, "2,050,000 tonnes"].sort(() => Math.random() - 0.5);
-
-      } else {
-        const unscaledSum = values.reduce((a, b) => a + b, 0);
-        const totalScaled = unscaledSum * scaleMultiplier;
-
-        correctAnswerStr = `${totalScaled.toLocaleString()} ${unitStr}`;
-        promptText = "How many total units were produced across all years shown in the chart below?";
-        explanationStr = `1. Sum of all bars = 25+40+60+45+65+50+75+80 = ${unscaledSum}. 2. Scale (× 10,000) = ${correctAnswerStr}.`;
-
-        options = [correctAnswerStr, `${unscaledSum} tonnes`, "3,040,000 tonnes", "2,050,000 tonnes"].sort(() => Math.random() - 0.5);
-      }
+      correctAnswerStr = "2,050,000 tonnes";
+      promptText = "How many total tonnes were produced after 1999? (See chart below)";
+      explanationStr = "1. Sum for years 2000, 2001, and 2002 = 50 + 75 + 80 = 205. 2. Scale multiplier (× 10,000) = 2,050,000 tonnes.";
+      options = ["2,050,000 tonnes", "205 tonnes", "1,250,000 tonnes", "3,040,000 tonnes"].sort(() => Math.random() - 0.5);
 
     } else if (type === 'TIER_2_MULTI_SERIES_CATEGORY_GROUP') {
-      const groups = ['G1', 'G2', 'G3', 'G4', 'G5'];
+      const groups = ['Group 1', 'Group 2', 'Group 3', 'Group 4', 'Group 5'];
       const menScores = [20, 34, 30, 35, 27];
       const womenScores = [25, 32, 34, 20, 25];
+      diagramSvg = this.generateGroupedSeriesSVG(groups, menScores, womenScores, "Men", "Women", "Scores Across Category Groups");
 
-      diagramSvg = this.generateGroupedSeriesSVG(groups, menScores, womenScores, "Men", "Women", "Scores");
-
-      const isWomen = Math.random() > 0.5;
-      const targetSeries = isWomen ? womenScores : menScores;
-      const targetLabel = isWomen ? "Women" : "Men";
-
-      const totalSum = targetSeries.reduce((a, b) => a + b, 0);
-      correctAnswerStr = `${totalSum}`;
-
-      promptText = `What was the total score of ${targetLabel} in all 5 groups? (See chart below)`;
-      explanationStr = `Sum of ${targetLabel} scores across G1 to G5 = ${targetSeries.join(' + ')} = ${totalSum}.`;
-
-      const dOtherSeries = `${(isWomen ? menScores : womenScores).reduce((a, b) => a + b, 0)}`;
-      const dAvg = `${(totalSum / 5).toFixed(1)}`;
-      const dOffByTen = `${totalSum - 10}`;
-
-      options = [correctAnswerStr, dOtherSeries, dAvg, dOffByTen].sort(() => Math.random() - 0.5);
+      correctAnswerStr = "136";
+      promptText = "What was the total combined score of Women across all 5 groups? (See chart below)";
+      explanationStr = "Women scores: 25 + 32 + 34 + 20 + 25 = 136.";
+      options = ["136", "146", "27.2", "150"].sort(() => Math.random() - 0.5);
 
     } else if (type === 'TIER_3_MONTHLY_TIME_SUBSETS') {
-      const months = ['July', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
       const values = [200, 400, 150, 450, 500, 220];
+      diagramSvg = this.generateSingleSeriesSVG(months, values, "Monthly Production (*Units in Thousands)", "#059669");
 
-      diagramSvg = this.generateSingleSeriesSVG(months, values, "Production (*Units in Thousands)", "#0284c7");
-
-      const q1Sum = values[0] + values[1] + values[2];
-      const scaledTotal = q1Sum * 1000;
-
-      correctAnswerStr = `${scaledTotal.toLocaleString()} units`;
+      correctAnswerStr = "750,000 units";
       promptText = "How many units were produced in the first 3 months shown in the chart combined?";
-      explanationStr = `1. Sum of July + Feb + Mar = 200 + 400 + 150 = 750 (thousand). 2. Scale (× 1,000) = ${correctAnswerStr}.`;
-
-      const dUnscaled = `${q1Sum} units`;
-      const dTotalAllMonths = `${(values.reduce((a,b)=>a+b,0) * 1000).toLocaleString()} units`;
-
-      options = [correctAnswerStr, dUnscaled, dTotalAllMonths, "1,920,000 units"].sort(() => Math.random() - 0.5);
+      explanationStr = "Jan + Feb + Mar = 200 + 400 + 150 = 750 (thousand) = 750,000 units.";
+      options = ["750,000 units", "750 units", "1,920,000 units", "500,000 units"].sort(() => Math.random() - 0.5);
 
     } else if (type === 'TIER_4_FLEET_FUEL_AND_HOURS') {
-      const machines = ['Excavator', 'Dozer', 'Scraper', 'Grader', 'Loader'];
-      const fuelRates = [18, 24, 32, 15, 22];
-      const operatingHours = [45, 50, 40, 38, 42];
+      const machines = ['Excavator', 'Dozer', 'Loader', 'Grader', 'Scraper'];
+      const fuelRates = [12.5, 18.0, 14.2, 10.5, 22.0];
+      const operatingHours = [40, 48, 35, 52, 44];
+      diagramSvg = this.generateGroupedSeriesSVG(machines, fuelRates, operatingHours, "Fuel Rate (gal/hr)", "Weekly Hours", "Fleet Operations Metrics");
 
-      diagramSvg = this.generateGroupedSeriesSVG(machines, fuelRates, operatingHours, "Fuel Rate (gal/hr)", "Weekly Hours", "Fleet Operations");
-
-      const sumFuel = fuelRates.reduce((a,b)=>a+b,0);
-      const avgFuel = (sumFuel / machines.length).toFixed(1);
-
-      correctAnswerStr = `${avgFuel} gal/hr`;
+      correctAnswerStr = "15.44 gal/hr";
       promptText = "Using the fleet operations chart below, what is the average hourly fuel consumption rate across all 5 heavy equipment types?";
-      explanationStr = `1. Total fuel rate sum = ${fuelRates.join(' + ')} = ${sumFuel} gal/hr. 2. Average = ${sumFuel} ÷ 5 = ${avgFuel} gal/hr.`;
-
-      const dSumOnly = `${sumFuel} gal/hr`;
-      const dHoursAvg = `${(operatingHours.reduce((a,b)=>a+b,0) / 5).toFixed(1)} gal/hr`;
-
-      options = [correctAnswerStr, dSumOnly, dHoursAvg, "18.5 gal/hr"].sort(() => Math.random() - 0.5);
+      explanationStr = "Total Fuel Rates = 12.5 + 18.0 + 14.2 + 10.5 + 22.0 = 77.2 gal/hr. Average = 77.2 ÷ 5 = 15.44 gal/hr.";
+      options = ["15.44 gal/hr", "17.20 gal/hr", "22.00 gal/hr", "12.50 gal/hr"].sort(() => Math.random() - 0.5);
 
     } else if (type === 'TIER_5_EARTHWORK_YARDAGE_MOVEMENT') {
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-      const yardage = [45, 52, 60, 65, 80, 75];
-      const scaleMultiplier = 1000;
+      const yardage = [1250, 1800, 2100, 1950, 2400, 1600];
+      diagramSvg = this.generateSingleSeriesSVG(months, yardage, "Earthwork Volume Moved (cu yds)", "#d97706");
 
-      diagramSvg = this.generateSingleSeriesSVG(months, yardage, "Earthwork Moved (in 1,000 cu yds)", "#d97706");
-
-      const qTypes = ['Q1', 'Q2'];
-      const selQ = this.getRandomElement(qTypes);
-
-      if (selQ === 'Q2') {
-        const q2Sum = yardage[3] + yardage[4] + yardage[5];
-        const scaled = q2Sum * scaleMultiplier;
-        correctAnswerStr = `${scaled.toLocaleString()} cu yds`;
-        promptText = "What was the total volume of earthwork material moved during the second quarter (April, May, June)?";
-        explanationStr = `1. Sum of April + May + June = 65 + 80 + 75 = 220 (in 1,000 cu yds). 2. Total = 220 × 1,000 = ${correctAnswerStr}.`;
-        options = [correctAnswerStr, "220 cu yds", "157,000 cu yds", "377,000 cu yds"].sort(() => Math.random() - 0.5);
-      } else {
-        const q1Sum = yardage[0] + yardage[1] + yardage[2];
-        const scaled = q1Sum * scaleMultiplier;
-        correctAnswerStr = `${scaled.toLocaleString()} cu yds`;
-        promptText = "What was the total volume of earthwork material moved during the first quarter (January, February, March)?";
-        explanationStr = `1. Sum of Jan + Feb + Mar = 45 + 52 + 60 = 157 (in 1,000 cu yds). 2. Total = 157 × 1,000 = ${correctAnswerStr}.`;
-        options = [correctAnswerStr, "157 cu yds", "220,000 cu yds", "377,000 cu yds"].sort(() => Math.random() - 0.5);
-      }
+      correctAnswerStr = "5,150 cu yds";
+      promptText = "What was the total volume of earthwork material moved during the first quarter (January, February, March)?";
+      explanationStr = "Q1 Total = 1,250 + 1,800 + 2,100 = 5,150 cu yds.";
+      options = ["5,150 cu yds", "11,400 cu yds", "16,550 cu yds", "4,200 cu yds"].sort(() => Math.random() - 0.5);
 
     } else {
-      const models = ['CAT 349', 'CAT D8T', 'CAT 621H', 'CAT 16M', 'CAT 980'];
-      const scheduledMaint = [12, 16, 20, 14, 18];
-      const unscheduledRepairs = [4, 15, 8, 3, 5];
-
+      const models = ['320 CAT', '336 CAT', 'D6 Dozer', 'D8 Dozer', '966 Loader'];
+      const scheduledMaint = [12, 16, 20, 24, 10];
+      const unscheduledRepairs = [8, 14, 22, 19, 5];
       diagramSvg = this.generateGroupedSeriesSVG(models, scheduledMaint, unscheduledRepairs, "Scheduled Maint (hrs)", "Unscheduled Repairs (hrs)", "Fleet Maintenance Hours");
 
-      const totalUnscheduled = unscheduledRepairs.reduce((a,b)=>a+b,0);
-      correctAnswerStr = `${totalUnscheduled} hours`;
-
+      correctAnswerStr = "68 hours";
       promptText = "What was the total number of unscheduled repair hours incurred across all 5 machinery models?";
-      explanationStr = `Sum of unscheduled repair hours (orange bars) = 4 + 15 + 8 + 3 + 5 = ${totalUnscheduled} hours.`;
-
-      const dScheduledTotal = `${scheduledMaint.reduce((a,b)=>a+b,0)} hours`;
-      const dCombinedTotal = `${totalUnscheduled + scheduledMaint.reduce((a,b)=>a+b,0)} hours`;
-
-      options = [correctAnswerStr, dScheduledTotal, dCombinedTotal, "25 hours"].sort(() => Math.random() - 0.5);
+      explanationStr = "Unscheduled repairs = 8 + 14 + 22 + 19 + 5 = 68 hours.";
+      options = ["68 hours", "90 hours", "158 hours", "45 hours"].sort(() => Math.random() - 0.5);
     }
 
     return {
@@ -1593,6 +1519,11 @@ class BarChartDataInterpretationGenerator {
   }
 }
 
+
+
+    // =========================================================
+    // QUIZ ENGINE HARNESS & CONTROLLER
+    // =========================================================
     class OETTQuizEngineController {
       constructor() {
         this.generators = {
@@ -1627,7 +1558,7 @@ class BarChartDataInterpretationGenerator {
         const shareLinkBtn = document.getElementById('share-link-btn');
         const quizForm = document.getElementById('quiz-form');
 
-        // Module selection change handler
+        // Module selection change handler - auto-generates new batch
         moduleSelect.addEventListener('change', () => {
           if (moduleSelect.value === 'FULL_ASSESSMENT') {
             countInput.value = 22;
@@ -1637,6 +1568,15 @@ class BarChartDataInterpretationGenerator {
             countInput.disabled = false;
             countInput.value = Math.min(Math.max(parseInt(countInput.value) || 5, 1), 25);
             countLimitLabel.textContent = '(1 to 25 Questions)';
+          }
+          this.generateAndRenderQuiz();
+        });
+
+        // Question count change handler - auto-generates new batch
+        countInput.addEventListener('change', () => {
+          if (moduleSelect.value !== 'FULL_ASSESSMENT') {
+            countInput.value = Math.min(Math.max(parseInt(countInput.value) || 5, 1), 25);
+            this.generateAndRenderQuiz();
           }
         });
 
@@ -1658,10 +1598,36 @@ class BarChartDataInterpretationGenerator {
           this.gradeAndSubmitQuiz();
         });
 
-        // Check URL parameters for Student Mode
+        // Parse URL parameters for Module, Count, ScriptUrl, and Student Mode
         const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.has('module')) {
+          const modParam = urlParams.get('module');
+          if (moduleSelect.querySelector(`option[value="${modParam}"]`)) {
+            moduleSelect.value = modParam;
+          }
+        }
+
+        if (urlParams.has('count')) {
+          const countParam = parseInt(urlParams.get('count'));
+          if (countParam >= 1 && countParam <= 25) {
+            countInput.value = countParam;
+          }
+        }
+
+        if (urlParams.has('scriptUrl')) {
+          document.getElementById('script-url-input').value = urlParams.get('scriptUrl');
+        }
+
         if (urlParams.get('mode') === 'student' || window.location.hash.includes('quiz=')) {
           document.getElementById('teacher-control-card').style.display = 'none';
+        }
+
+        // Handle full assessment lock if needed
+        if (moduleSelect.value === 'FULL_ASSESSMENT') {
+          countInput.value = 22;
+          countInput.disabled = true;
+          countLimitLabel.textContent = '(Locked to 22 for Full Exam)';
         }
 
         // Initial Generation
@@ -1787,17 +1753,42 @@ class BarChartDataInterpretationGenerator {
         const firstName = document.getElementById('student-first-name').value.trim();
         const lastName = document.getElementById('student-last-name').value.trim();
 
+
+// ========================================================= 
+// PART A: NAME VALIDATION GUARD (PASTE HERE) 
+// ========================================================= 
+
+if (!firstName || !lastName) { 
+alert("⚠️ Please enter both your First and Last Name before submitting your assessment."); 
+
+const nameCard = document.getElementById('student-info-card'); 
+if (nameCard) nameCard.scrollIntoView({ behavior: 'smooth' }); 
+
+if (!firstName) document.getElementById('student-first-name').classList.add('border-red-500'); 
+if (!lastName) document.getElementById('student-last-name').classList.add('border-red-500'); 
+
+return; // STOP! Do not grade or send to Google Sheets 
+} 
+
+// Reset red borders if names are valid 
+document.getElementById('student-first-name').classList.remove('border-red-500'); 
+document.getElementById('student-last-name').classList.remove('border-red-500'); 
+
+// =========================================================
+
+
         this.currentQuestions.forEach((q, idx) => {
           const selected = document.querySelector(`input[name="question-${idx}"]:checked`);
           const expBox = document.getElementById(`explanation-${idx}`);
-          expBox.classList.remove('hidden');
+          if (expBox) expBox.classList.remove('hidden');
 
           q.options.forEach((opt, oIdx) => {
             const label = document.getElementById(`opt-label-${idx}-${oIdx}`);
-            label.classList.remove('correct-bg', 'incorrect-bg');
-
-            if (opt === q.correctAnswer) {
-              label.classList.add('correct-bg');
+            if (label) {
+              label.classList.remove('correct-bg', 'incorrect-bg');
+              if (opt === q.correctAnswer) {
+                label.classList.add('correct-bg');
+              }
             }
           });
 
@@ -1807,7 +1798,7 @@ class BarChartDataInterpretationGenerator {
             const selectedOptIdx = q.options.indexOf(selected.value);
             if (selectedOptIdx !== -1) {
               const selectedLabel = document.getElementById(`opt-label-${idx}-${selectedOptIdx}`);
-              selectedLabel.classList.add('incorrect-bg');
+              if (selectedLabel) selectedLabel.classList.add('incorrect-bg');
             }
           }
         });
@@ -1823,17 +1814,15 @@ class BarChartDataInterpretationGenerator {
         }
 
         const studentNameDisplay = (firstName || lastName) ? `Student: ${firstName} ${lastName} — ` : '';
-        resultsBanner.innerHTML = `
-          <div>${studentNameDisplay}Score: ${score} / ${total} (${percentage}%)</div>
-          <div class="text-xs font-normal mt-1">${percentage >= 70 ? '🎉 Passed OETT Assessment Benchmark' : '⚠️ Review Explanations & Retry Batch'}</div>
-        `;
 
         // Send results to Google Sheets Script URL if provided
         const scriptUrl = document.getElementById('script-url-input').value.trim();
+        let loggerText = '';
         if (scriptUrl) {
+          loggerText = '<div class="text-xs font-semibold text-emerald-800 mt-1">✅ Score recorded in instructor Google Sheet.</div>';
           const payload = {
-            firstName: firstName || 'Anonymous',
-            lastName: lastName || 'Student',
+            firstName: firstName,
+            lastName: lastName,
             score: score,
             total: total,
             percentage: percentage,
@@ -1849,17 +1838,40 @@ class BarChartDataInterpretationGenerator {
           }).catch(err => console.error("Error submitting to Google Sheets:", err));
         }
 
+        resultsBanner.innerHTML = `
+          <div>${studentNameDisplay}Score: ${score} / ${total} (${percentage}%)</div>
+          <div class="text-xs font-normal mt-1">${percentage >= 70 ? '🎉 Passed OETT Assessment Benchmark' : '⚠️ Review Explanations & Retry Batch'}</div>
+          ${loggerText}
+        `;
+
         // Scroll to results banner
         resultsBanner.scrollIntoView({ behavior: 'smooth' });
       }
 
       copyStudentShareLink() {
         const currentUrl = new URL(window.location.href);
+        const moduleVal = document.getElementById('module-select').value;
+        const countVal = document.getElementById('count-input').value;
+        const scriptUrl = document.getElementById('script-url-input').value.trim();
+
         currentUrl.searchParams.set('mode', 'student');
-        currentUrl.searchParams.set('module', document.getElementById('module-select').value);
+        currentUrl.searchParams.set('module', moduleVal);
+        currentUrl.searchParams.set('count', countVal);
+
+        if (scriptUrl) {
+          currentUrl.searchParams.set('scriptUrl', scriptUrl);
+        } else {
+          currentUrl.searchParams.delete('scriptUrl');
+        }
 
         navigator.clipboard.writeText(currentUrl.toString()).then(() => {
-          alert('🔗 Student Quiz Link copied to clipboard! Share this link with students to auto-open in Student Mode.');
+          let msg = '🔗 Student Quiz Link copied to clipboard! Share this link with students to auto-open in Student Mode.\n\nAssigned Module: ' + moduleVal + '\nQuestion Count: ' + countVal;
+          if (scriptUrl) {
+            msg += '\nGoogle Sheets Auto-Logger: ACTIVE';
+          } else {
+            msg += '\nNote: No Google Sheets URL was provided, so student scores will not be logged automatically.';
+          }
+          alert(msg);
         }).catch(err => {
           alert('Student Link: ' + currentUrl.toString());
         });
